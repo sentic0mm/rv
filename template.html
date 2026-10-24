@@ -7,21 +7,21 @@
 <style>
 :root{
   --bg:#f4f1ea; --panel:#fffdf8; --panel2:#ece7dc; --line:#d9d2c3; --text:#1d1b17; --muted:#6c665b;
-  --accent:#c2410c; --accent-ink:#fff; --mark:#fde68a;
+  --accent:#c2410c; --accent-ink:#fff; --mark:#fde68a; --good:#15803d; --bad:#b91c1c;
   --m-headman:#9a3412; --m-mcjannek:#0369a1; --m-museum:#7e22ce; --m-swift:#15803d; --m-any:#a16207;
   --shadow:0 1px 2px rgba(0,0,0,.06),0 4px 16px rgba(0,0,0,.05);
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
     --bg:#121110; --panel:#1b1a18; --panel2:#24221f; --line:#34312c; --text:#ece8df; --muted:#9b958a;
-    --accent:#f97316; --accent-ink:#1a0d03; --mark:#854d0e;
+    --accent:#f97316; --accent-ink:#1a0d03; --mark:#854d0e; --good:#5fd38a; --bad:#f87171;
     --m-headman:#f0875a; --m-mcjannek:#5ab8f0; --m-museum:#c58af5; --m-swift:#5fd38a; --m-any:#e8c14d;
     --shadow:0 1px 2px rgba(0,0,0,.4),0 6px 20px rgba(0,0,0,.3);
   }
 }
 :root[data-theme="dark"]{
   --bg:#121110; --panel:#1b1a18; --panel2:#24221f; --line:#34312c; --text:#ece8df; --muted:#9b958a;
-  --accent:#f97316; --accent-ink:#1a0d03; --mark:#854d0e;
+  --accent:#f97316; --accent-ink:#1a0d03; --mark:#854d0e; --good:#5fd38a; --bad:#f87171;
   --m-headman:#f0875a; --m-mcjannek:#5ab8f0; --m-museum:#c58af5; --m-swift:#5fd38a; --m-any:#e8c14d;
   --shadow:0 1px 2px rgba(0,0,0,.4),0 6px 20px rgba(0,0,0,.3);
 }
@@ -36,19 +36,27 @@ h1 span{color:var(--accent)}
 .sub{color:var(--muted);margin-top:4px}
 .sub a{color:inherit}
 
+/* Tabs */
+.tabs{display:flex;gap:4px;margin-top:16px;border-bottom:1px solid var(--line);overflow-x:auto}
+.tab{border:0;background:none;padding:10px 14px;cursor:pointer;color:var(--muted);font-weight:600;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap}
+.tab:hover{color:var(--text)}
+.tab[aria-selected="true"]{color:var(--accent);border-bottom-color:var(--accent)}
+.view[hidden]{display:none}
+
 /* Steuerleiste */
 .controls{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(6px);padding:12px 0;border-bottom:1px solid var(--line)}
 .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .row+.row{margin-top:8px}
 .search{position:relative;flex:1 1 280px}
 .search input{width:100%;padding:10px 36px 10px 38px;border:1px solid var(--line);border-radius:10px;background:var(--panel);outline:none}
-.search input:focus{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%,transparent)}
+.search input:focus,.field input:focus,.field select:focus{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%,transparent);outline:none}
 .search svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);width:18px;height:18px;color:var(--muted)}
 .search kbd{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--muted);border:1px solid var(--line);border-radius:5px;padding:0 5px}
 .search button.clear{position:absolute;right:6px;top:50%;transform:translateY(-50%);border:0;background:none;cursor:pointer;color:var(--muted);font-size:18px;padding:2px 8px;display:none}
 .search.has .clear{display:block}.search.has kbd{display:none}
 select,.btn{padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:var(--panel);cursor:pointer}
 .btn:hover,select:hover{border-color:var(--muted)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:600}
 label.ctl{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:13px}
 .chips{display:flex;flex-wrap:wrap;gap:6px}
 .chip{display:inline-flex;align-items:center;gap:6px;padding:6px 11px;border:1px solid var(--line);border-radius:999px;background:var(--panel);cursor:pointer;font-size:13.5px;white-space:nowrap}
@@ -69,20 +77,21 @@ th{font-size:12.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--mu
 th[data-sort]{cursor:pointer}
 th[data-sort]:hover{color:var(--text)}
 th .ar{display:inline-block;width:1em;color:var(--accent)}
-tbody tr{cursor:pointer}
-tbody tr:hover td{background:color-mix(in srgb,var(--accent) 7%,var(--panel))}
-td.num{font-variant-numeric:tabular-nums;white-space:nowrap}
+#out tbody tr{cursor:pointer}
+#out tbody tr:hover td{background:color-mix(in srgb,var(--accent) 7%,var(--panel))}
+td.num,th.num{font-variant-numeric:tabular-nums;white-space:nowrap}
 td.img{width:56px;padding:4px 8px}
 .thumb{width:44px;height:44px;object-fit:contain;display:block;filter:drop-shadow(0 1px 1px rgba(0,0,0,.3))}
 .name{font-weight:600}
 .mapname{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
 .vt{display:inline-block;padding:2px 8px;border-radius:6px;font-size:12.5px;font-weight:600;white-space:nowrap;background:color-mix(in srgb,var(--vc) 18%,transparent);color:var(--vc);border:1px solid color-mix(in srgb,var(--vc) 40%,transparent)}
-.tag{display:inline-block;font-size:11px;padding:1px 6px;border-radius:5px;border:1px solid var(--line);color:var(--muted);margin-left:6px;vertical-align:1px}
+.tag{display:inline-block;font-size:11px;padding:1px 6px;border-radius:5px;border:1px solid var(--line);color:var(--muted);margin-left:6px;vertical-align:1px;white-space:nowrap}
 .tag.trap{color:var(--accent);border-color:color-mix(in srgb,var(--accent) 50%,transparent)}
+.tag.fix{color:var(--good);border-color:color-mix(in srgb,var(--good) 50%,transparent);cursor:help}
 mark{background:var(--mark);color:inherit;border-radius:3px;padding:0 1px}
 tr.group td{background:var(--panel2);font-weight:700;cursor:default;padding:10px}
 tr.group:hover td{background:var(--panel2)}
-tr.group .gmeta{font-weight:400;color:var(--muted);margin-left:10px;font-size:13px}
+.gmeta{font-weight:400;color:var(--muted);margin-left:10px;font-size:13px}
 
 /* Karten */
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
@@ -92,23 +101,66 @@ tr.group .gmeta{font-weight:400;color:var(--muted);margin-left:10px;font-size:13
 .card .meta{min-width:0;display:flex;flex-direction:column;gap:3px;font-size:13px}
 .card .name{font-size:14.5px}
 .card .price{font-variant-numeric:tabular-nums;font-weight:600}
-.ghead{grid-column:1/-1;margin:12px 0 0;font-size:16px;display:flex;align-items:baseline;gap:10px}
+.ghead{grid-column:1/-1;margin:12px 0 0;font-size:16px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
 .ghead:first-child{margin-top:0}
-.ghead .gmeta{font-weight:400;color:var(--muted);font-size:13px}
 .empty{padding:40px;text-align:center;color:var(--muted);background:var(--panel);border:1px dashed var(--line);border-radius:12px}
 
-/* Value-Type-Legende */
-section.legend{margin:28px 0 40px}
-section.legend h2{font-size:18px;margin:0 0 4px}
-section.legend p{color:var(--muted);margin:0 0 12px;font-size:14px}
+/* Legenden */
+section.legend{margin:28px 0 0}
+section.legend:last-of-type{margin-bottom:40px}
+section h2{font-size:18px;margin:0 0 4px}
+section p.lead{color:var(--muted);margin:0 0 12px;font-size:14px}
 .ltable{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:8px}
 .lrow{display:flex;align-items:center;gap:10px;justify-content:space-between;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px 12px;cursor:pointer;text-align:left;width:100%}
 .lrow:hover{border-color:var(--accent)}
 .lrow .r{font-variant-numeric:tabular-nums;color:var(--muted);font-size:13.5px}
-.lrow .c{font-size:12px;color:var(--muted)}
+.lrow .c{font-size:12px;color:var(--muted);white-space:nowrap}
+
+/* Rechner */
+.calc{display:grid;grid-template-columns:minmax(280px,360px) minmax(0,1fr);gap:16px;margin:16px 0 40px;align-items:start}
+.calc>div{min-width:0}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:var(--shadow)}
+.panel h3{margin:0 0 10px;font-size:15px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.panel+.panel{margin-top:16px}
+.field{display:flex;flex-direction:column;gap:5px;margin-bottom:12px;font-size:13px;color:var(--muted)}
+.field input,.field select{padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--text);width:100%}
+.field input[type=range]{padding:0;accent-color:var(--accent)}
+.field .hint{font-size:12px}
+.checks{display:flex;flex-direction:column;gap:6px;font-size:14px}
+.checks label{display:flex;gap:8px;align-items:center;cursor:pointer}
+.checks input{accent-color:var(--accent)}
+.pick{display:flex;gap:12px;align-items:center;margin:4px 0 12px}
+.pick img{width:72px;height:72px;object-fit:contain;background:var(--panel2);border-radius:12px;padding:6px}
+.pick .name{font-size:17px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.tile{background:var(--panel2);border-radius:12px;padding:12px}
+.tile .k{font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.tile .v{font-size:22px;font-weight:700;font-variant-numeric:tabular-nums;margin-top:2px}
+.tile .s{font-size:12.5px;color:var(--muted);margin-top:2px}
+.tile.l1{border-left:4px solid #d9a21f}.tile.l2{border-left:4px solid #e07b2b}.tile.l3{border-left:4px solid #d14b4b}
+.tile.hl{background:color-mix(in srgb,var(--accent) 14%,var(--panel2))}
+.calc table{box-shadow:none;margin-top:4px}
+.calc td,.calc th{padding:7px 9px}
+.calc th{white-space:normal}
+.yes{color:var(--good);font-weight:600}.no{color:var(--bad);font-weight:600}
+.bar{height:12px;border-radius:6px;background:var(--panel2);overflow:hidden;margin:8px 0 4px}
+.bar i{display:block;height:100%;background:var(--good);transition:width .25s}
+.bar.low i{background:var(--bad)}
+.log{max-height:220px;overflow:auto;font-size:13.5px;font-variant-numeric:tabular-nums;margin-top:8px;display:flex;flex-direction:column-reverse;gap:2px}
+.log div{display:flex;justify-content:space-between;gap:12px;padding:3px 0;border-bottom:1px dashed var(--line)}
+.btnrow{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.formula{font-family:ui-monospace,Consolas,monospace;font-size:13px;background:var(--panel2);border-radius:10px;padding:10px 12px;overflow-x:auto;white-space:pre;line-height:1.6}
+.note{margin-top:12px;padding:10px 12px;border-radius:10px;background:var(--panel2);font-size:13.5px}
+.note b{color:var(--accent)}
+.levels{display:flex;flex-wrap:wrap;gap:6px}
+.levels .chip{min-width:44px;justify-content:center}
+.big-input{font-size:20px !important;font-weight:700;font-variant-numeric:tabular-nums}
+.diff{color:var(--bad);font-weight:600}
+.same{color:var(--muted)}
+.scroll{overflow-x:auto}
 
 /* Detail-Dialog */
-dialog{border:1px solid var(--line);border-radius:16px;background:var(--panel);color:var(--text);padding:0;width:min(520px,calc(100vw - 32px));box-shadow:0 20px 60px rgba(0,0,0,.4)}
+dialog{border:1px solid var(--line);border-radius:16px;background:var(--panel);color:var(--text);padding:0;width:min(560px,calc(100vw - 32px));box-shadow:0 20px 60px rgba(0,0,0,.4)}
 dialog::backdrop{background:rgba(0,0,0,.5)}
 .dlg-head{display:flex;gap:14px;padding:18px 18px 12px;align-items:center}
 .dlg-head img{width:96px;height:96px;object-fit:contain;background:var(--panel2);border-radius:12px;padding:6px}
@@ -117,17 +169,17 @@ dialog::backdrop{background:rgba(0,0,0,.5)}
 dl{display:grid;grid-template-columns:auto 1fr;gap:7px 14px;margin:0}
 dt{color:var(--muted);font-size:13.5px}
 dd{margin:0;font-variant-numeric:tabular-nums}
-.note{margin-top:14px;padding:10px 12px;border-radius:10px;background:var(--panel2);font-size:13.5px}
-.note b{color:var(--accent)}
-.dlg-foot{display:flex;justify-content:space-between;gap:8px;padding:12px 18px;border-top:1px solid var(--line)}
+.dlg-foot{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;padding:12px 18px;border-top:1px solid var(--line)}
 .dlg-foot a{color:var(--accent)}
 .x{border:0;background:none;font-size:22px;cursor:pointer;color:var(--muted);margin-left:auto;align-self:flex-start}
-.dmg{display:flex;gap:4px;flex-wrap:wrap}
-.dmg span{padding:1px 7px;border-radius:5px;background:var(--panel2);font-size:13px}
+.dist{display:flex;flex-wrap:wrap;gap:4px}
+.dist span{padding:1px 7px;border-radius:5px;background:var(--panel2);font-size:12.5px}
 
+@media (max-width:860px){
+  .calc{grid-template-columns:minmax(0,1fr)}
+}
 @media (max-width:760px){
   h1{font-size:23px}
-  .hide-sm{display:none}
   th.hide-md,td.hide-md{display:none}
   td.img{width:44px}.thumb{width:36px;height:36px}
   th,td{padding:7px 6px}
@@ -139,6 +191,7 @@ dd{margin:0;font-variant-numeric:tabular-nums}
   td .mapname .mt{display:none}
   td .mapname{display:flex;justify-content:center}
   .name{font-size:14px}
+  .tile .v{font-size:19px}
 }
 </style>
 </head>
@@ -146,10 +199,17 @@ dd{margin:0;font-variant-numeric:tabular-nums}
 <div class="wrap">
   <header>
     <h1>R.E.P.O. <span>Valuables</span></h1>
-    <div class="sub">Alle <b id="total"></b> Valuables aus den Leveln &middot; Daten vom <a href="https://repo-2025horror.fandom.com/wiki/Valuables" target="_blank" rel="noopener">R.E.P.O. Wiki</a> &middot; Klick auf ein Item für Details</div>
+    <div class="sub">Alle <b id="total"></b> Valuables aus den Leveln &middot; Bilder und Beschreibungen vom <a href="https://repo-2025horror.fandom.com/wiki/Valuables" target="_blank" rel="noopener">R.E.P.O. Wiki</a>, Werte und Formeln aus den Spieldaten</div>
+    <nav class="tabs" role="tablist">
+      <button class="tab" role="tab" data-tab="valuables">Valuables</button>
+      <button class="tab" role="tab" data-tab="schaden">Schadens-Rechner</button>
+      <button class="tab" role="tab" data-tab="level">Level-Geld</button>
+    </nav>
   </header>
 </div>
 
+<!-- ================= Tab 1: Liste ================= -->
+<section class="view" id="view-valuables">
 <div class="controls">
   <div class="wrap">
     <div class="row">
@@ -159,15 +219,15 @@ dd{margin:0;font-variant-numeric:tabular-nums}
         <kbd>/</kbd>
         <button class="clear" id="clearQ" aria-label="Suche leeren">&times;</button>
       </div>
-      <label class="ctl">Value Type
-        <select id="vt"><option value="all">Alle</option></select>
-      </label>
+      <label class="ctl">Value Type <select id="vt"></select></label>
+      <label class="ctl">Haltbarkeit <select id="dur"></select></label>
       <label class="ctl">Sortieren
         <select id="sort">
           <option value="name">Name</option>
           <option value="value">Wert (min)</option>
           <option value="max">Wert (max)</option>
           <option value="vt">Value Type</option>
+          <option value="dur">Haltbarkeit</option>
           <option value="map">Map</option>
           <option value="size">Größe</option>
           <option value="mass">Masse</option>
@@ -180,13 +240,15 @@ dd{margin:0;font-variant-numeric:tabular-nums}
           <option value="none">Keine</option>
           <option value="map">Map</option>
           <option value="vt">Value Type</option>
+          <option value="dur">Haltbarkeit</option>
           <option value="size">Größe</option>
         </select>
       </label>
       <button class="btn" id="view" aria-label="Ansicht wechseln">Karten</button>
     </div>
     <div class="row"><span class="chip-label">Map</span><div class="chips" id="maps"></div></div>
-    <div class="row"><span class="chip-label">Größe</span><div class="chips" id="sizes"></div></div>
+    <div class="row"><span class="chip-label">Größe</span><div class="chips" id="sizes"></div>
+      <button class="chip" id="corrOnly" aria-pressed="false" title="Items, bei denen das Wiki von den Spieldaten abweicht">nur Wiki-Korrekturen <span class="n" id="corrN"></span></button></div>
   </div>
 </div>
 
@@ -196,10 +258,138 @@ dd{margin:0;font-variant-numeric:tabular-nums}
 
   <section class="legend">
     <h2>Value Types</h2>
-    <p>Der Value Type legt fest, in welchem Bereich der Preis eines Items gewürfelt wird (auf 100 gerundet). Klick filtert die Liste.</p>
+    <p class="lead">Der Value Type legt den Preisbereich fest. Das Spiel würfelt darin einen Betrag und rundet ihn auf 100 (Banker's Rounding). Deshalb kommen bei Cheap nur $500 oder $600 vor. Klick filtert die Liste.</p>
     <div class="ltable" id="legend"></div>
   </section>
+  <section class="legend">
+    <h2>Haltbarkeit</h2>
+    <p class="lead">Wie leicht ein Item bricht (Zerbrechlichkeit) und wie viel Prozent vom Startwert ein Bruch kostet (leicht / mittel / schwer). Klick filtert die Liste.</p>
+    <div class="ltable" id="durLegend"></div>
+  </section>
 </div>
+</section>
+
+<!-- ================= Tab 2: Schadens-Rechner ================= -->
+<section class="view" id="view-schaden" hidden>
+<div class="wrap">
+  <div class="calc">
+    <div>
+      <div class="panel">
+        <h3>Item</h3>
+        <div class="field">
+          <input id="dItem" list="itemList" placeholder="Item suchen …" autocomplete="off" spellcheck="false" aria-label="Item auswählen">
+          <datalist id="itemList"></datalist>
+        </div>
+        <div class="pick" id="dPick"></div>
+        <div class="field">
+          <span>Startwert <b id="dValueOut"></b></span>
+          <input id="dValue" type="range" step="100">
+          <span class="hint" id="dValueHint"></span>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>Umstände</h3>
+        <div class="field">
+          <span>Level (für das Betäuben, ab Level 5 strenger)</span>
+          <select id="dLevel"></select>
+        </div>
+        <div class="field">
+          <span>Monster</span>
+          <select id="dEnemy"></select>
+        </div>
+        <div class="checks">
+          <label><input type="radio" name="dMod" value="1" checked> normal</label>
+          <label><input type="radio" name="dMod" value="0.65"> Torque-Drohne hält es (Zerbrechlichkeit × 0,65)</label>
+          <label><input type="radio" name="dMod" value="0.1"> Torque-Orb in der Nähe (Zerbrechlichkeit × 0,1)</label>
+          <label><input type="radio" name="dMod" value="0"> Unzerstörbar (C.A.R.T., Extraction Point, Indestructible-Drohne/-Orb)</label>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="panel">
+        <h3>Wann bricht es?</h3>
+        <div class="tiles" id="dBreak"></div>
+        <div class="note">Gemessen wird, wie viel <b>Tempo</b> das Item innerhalb eines Physik-Takts (1/50 s) verliert. Prallt es ab und fliegt gleich schnell weiter, passiert nichts. Die Masse spielt dabei keine Rolle.</div>
+      </div>
+      <div class="panel">
+        <h3>Was kostet ein Stoß?</h3>
+        <div class="tiles" id="dLoss"></div>
+      </div>
+      <div class="panel">
+        <h3>Ausprobieren</h3>
+        <div id="dSimHead"></div>
+        <div class="bar" id="dBar"><i></i></div>
+        <div class="btnrow">
+          <button class="btn" data-hit="1">Leichter Stoß</button>
+          <button class="btn" data-hit="2">Mittlerer Stoß</button>
+          <button class="btn" data-hit="3">Schwerer Stoß</button>
+          <button class="btn" data-hit="enemy">Monster getroffen</button>
+          <button class="btn" data-hit="reset">Neu</button>
+        </div>
+        <div class="log" id="dLog"></div>
+      </div>
+      <div class="panel">
+        <h3>Gegen Monster und Spieler</h3>
+        <div id="dEnemyOut"></div>
+      </div>
+      <div class="panel">
+        <h3>So rechnet das Spiel</h3>
+        <div class="formula">Tempoverlust  = |Tempo vorher − Tempo jetzt|   (pro Takt, 50 Takte/s)
+Bruchkraft   = 16 × Tempoverlust ÷ 0,02 × Zerbrechlichkeit/100 × Modifikator
+Bruch        ab Bruchkraft 300 (leicht) / 400 (mittel) / 500 (schwer)
+
+Verlust      = Startwert × 1 % / 5 % / 10 % × (1 + 9 × (100 − Haltbarkeit)/100)  ± 10 %
+Zerstört     wenn Restwert &lt; 15 % vom Startwert
+
+Monster      = 5 × Stufe × Masse × Monster-Multiplikator   (Item schneller als 2 m/s)
+               kostet immer einen schweren Bruch, mindestens 20 % (Tiny/Small),
+               14 % (Medium) oder 10 % (größer) vom Startwert, je ± 5 %
+Spieler      = 2,5 × Stufe × Masse   (Item schneller als 3 m/s)</div>
+        <div class="note">Quelle: <code>PhysGrabObjectImpactDetector</code> im Spielcode. Haltbarkeit, Masse und Preise stammen aus den Prefabs des Spiels, nicht aus dem Wiki.</div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ================= Tab 3: Level-Geld ================= -->
+<section class="view" id="view-level" hidden>
+<div class="wrap">
+  <div class="calc">
+    <div>
+      <div class="panel">
+        <h3>Level</h3>
+        <div class="levels" id="lLevels"></div>
+      </div>
+      <div class="panel">
+        <h3>Erster Extraction Point</h3>
+        <div class="field">
+          <span>Wie viel will er haben? (in $)</span>
+          <input id="lGoal" class="big-input" type="number" min="0" step="1" inputmode="numeric" placeholder="z.B. 21000">
+          <span class="hint">Alle Extraction Points im Level verlangen gleich viel.</span>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="panel">
+        <h3>Ergebnis</h3>
+        <div class="tiles" id="lOut"></div>
+        <div class="note" id="lNote"></div>
+      </div>
+      <div class="panel">
+        <h3>So rechnet das Spiel</h3>
+        <div class="formula" id="lFormula"></div>
+        <div class="note">Quelle: <code>RoundDirector.StartRound</code>, <code>ExtractionPoint</code>, <code>LevelGenerator</code> und <code>ValuableDirector.SetupHost</code> im Spielcode. Die Kurvenwerte stammen aus der Spielszene.</div>
+      </div>
+    </div>
+  </div>
+  <section class="legend">
+    <h2>Alle Level: Spiel gegen Wiki</h2>
+    <p class="lead">Links die Werte aus dem Spielcode, rechts die Tabelle im Wiki. Rot heißt, das Wiki weicht ab.</p>
+    <div class="scroll" id="lTable"></div>
+  </section>
+</div>
+</section>
 
 <dialog id="dlg"></dialog>
 
@@ -207,8 +397,12 @@ dd{margin:0;font-variant-numeric:tabular-nums}
 const DATA = /*DATA*/null;
 const ITEMS = DATA.items;
 const TYPES = DATA.types;
+const CURVES = DATA.curves;
+const ENEMIES = DATA.enemies;
+const WIKI_LEVELS = DATA.wikiLevels;
 const VT_INDEX = Object.fromEntries(TYPES.map((t, i) => [t.name, i]));
 const SIZES = ['Tiny', 'Small', 'Medium', 'Big', 'Wide', 'Tall', 'Very Tall'];
+const SIZE_KEYS = ['tiny', 'small', 'medium', 'big', 'wide', 'tall', 'veryTall'];
 const MAPS = [
   {key: 'Headman Manor', color: 'var(--m-headman)'},
   {key: 'McJannek Station', color: 'var(--m-mcjannek)'},
@@ -218,45 +412,108 @@ const MAPS = [
 ];
 const MAP_BY = Object.fromEntries(MAPS.map(m => [m.key, m]));
 const mapLabel = k => MAP_BY[k]?.label || k;
-const SPECIAL = 'Eigener Bereich';
+const SPECIAL = 'Variabel';
 
-// Farbe pro Value Type: von grau (billig) über grün/blau/lila zu gold (teuer)
+// Haltbarkeitsstufen aus den Daten, sortiert von zerbrechlich nach robust
+const DURS = [...new Map(ITEMS.map(it => [it.dur, {name: it.dur, frag: it.frag, durab: it.durab}])).values()]
+  .sort((a, b) => a.durab - b.durab || b.frag - a.frag);
+const DUR_INDEX = Object.fromEntries(DURS.map((d, i) => [d.name, i]));
+const DUR_COLORS = {'Weak': '#d14b4b', 'Weak+': '#e07b2b', 'Weak++': '#d9a21f', 'Default': '#8b8578', 'Strong': '#2b8fbf', 'Strong+': '#6b5be0'};
+const durColor = d => DUR_COLORS[d] || '#8b8578';
+
 const VT_COLORS = ['#8b8578','#8b8578','#7c9a6b','#4d9a55','#2f9e7a','#2b8fbf','#3b74d9','#5b5be0','#8a4fe0','#b743c9','#d9822b','#e0a21f','#e8bf1a'];
 const vtColor = vt => vt in VT_INDEX ? VT_COLORS[VT_INDEX[vt]] : '#d14b4b';
 
-// Sonderfälle mit eigener Erklärung (Wiki-Infos)
 const NOTES = {
-  'Small Enemy Valuable': 'Seelen-Orb, droppt beim Töten eines Monsters (Tier 1). Ab Level 20 (Super Moon) explodiert er beim Zerbrechen (~50 Schaden).',
-  'Medium Enemy Valuable': 'Seelen-Orb, droppt beim Töten eines Monsters (Tier 2). Ab Level 20 explodiert er beim Zerbrechen (~100 Schaden).',
-  'Big Enemy Valuable': 'Seelen-Orb, droppt beim Töten eines Monsters (Tier 3). Ab Level 20 explodiert er beim Zerbrechen (~150 Schaden).',
-  'Small Surplus Valuable': 'Geldsack: entsteht, wenn man am Extraction Point über das Ziel abliefert (oder beim Gambit auf Gelb). Größe hängt vom Überschuss ab.',
-  'Medium Surplus Valuable': 'Geldsack: entsteht, wenn man am Extraction Point über das Ziel abliefert (oder beim Gambit auf Gelb). Größe hängt vom Überschuss ab.',
-  'Big Surplus Valuable': 'Geldsack: entsteht, wenn man am Extraction Point über das Ziel abliefert (oder beim Gambit auf Gelb). Größe hängt vom Überschuss ab.',
-  'Cocktail': 'Verliert ca. $500, wenn die Flüssigkeit aus dem Glas schwappt – auch mit Indestructible Drone.',
-  'Egg': 'Masse und Schaden variieren (bis 3 kg / 45 Schaden).',
+  'Small Enemy Valuable': 'Seelen-Orb, droppt beim Töten eines Monsters. Ab Level 20 (Super Moon) explodiert er beim Zerbrechen (~50 Schaden).',
+  'Medium Enemy Valuable': 'Seelen-Orb, droppt beim Töten eines Monsters. Ab Level 20 explodiert er beim Zerbrechen (~100 Schaden).',
+  'Big Enemy Valuable': 'Seelen-Orb, droppt beim Töten eines Monsters. Ab Level 20 explodiert er beim Zerbrechen (~150 Schaden).',
+  'Small Surplus Valuable': 'Geldsack: entsteht, wenn man am Extraction Point mehr als das Ziel abliefert (oder beim Gambit auf Gelb). Der Wert ist der Überschuss.',
+  'Medium Surplus Valuable': 'Geldsack: entsteht, wenn man am Extraction Point mehr als das Ziel abliefert (oder beim Gambit auf Gelb). Der Wert ist der Überschuss.',
+  'Big Surplus Valuable': 'Geldsack: entsteht, wenn man am Extraction Point mehr als das Ziel abliefert (oder beim Gambit auf Gelb). Der Wert ist der Überschuss.',
+  'Cocktail': 'Verliert ca. $500, wenn die Flüssigkeit aus dem Glas schwappt, auch mit Indestructible-Drohne.',
 };
 
-const fmt = n => '$' + n.toLocaleString('en-US');
+// ---------- Spielformeln ----------
+// Mathf.RoundToInt / Mathf.Round: bei genau .5 zur geraden Zahl
+function rint(x) {
+  const f = Math.floor(x), d = x - f;
+  if (Math.abs(d - 0.5) < 1e-9) return f % 2 === 0 ? f : f + 1;
+  return d > 0.5 ? f + 1 : f;
+}
+const BREAK_LEVELS = [300, 400, 500];
+const BREAK_SHARE = [0.01, 0.05, 0.1];
+const BREAK_NAMES = ['leicht', 'mittel', 'schwer'];
+const BREAK_ADJ = ['leichter', 'mittlerer', 'schwerer'];
+const lossFactor = (lvl, durab) => BREAK_SHARE[lvl - 1] * (1 + 9 * (100 - durab) / 100);
+// Tempoverlust pro Takt (m/s), ab dem Stufe lvl bricht: 16·dv/0,02·frag/100·mod > Grenze
+const breakSpeed = (lvl, frag, mod) => BREAK_LEVELS[lvl - 1] / (8 * frag * mod);
+const lossOf = (lvl, it, value) => rint(value * lossFactor(lvl, it.durab));
+const enemyDamage = (lvl, mass, mult) => rint(rint(10 * lvl * (mass * 0.5)) * mult);
+const playerDamage = (lvl, mass) => rint(5 * lvl * (mass * 0.5));
+const ENEMY_HIT_MIN = {'Tiny': 0.2, 'Small': 0.2, 'Medium': 1 / 7, 'Big': 0.1, 'Wide': 0.1, 'Tall': 0.1, 'Very Tall': 0.1};
+const STUN_MASS = {'VeryLight': 0.5, 'Light': 1, 'Medium': 2, 'Heavy': 3.5, 'VeryHeavy': 5};
+const WEIGHT_DE = {'VeryLight': 'sehr leicht', 'Light': 'leicht', 'Medium': 'mittel', 'Heavy': 'schwer', 'VeryHeavy': 'sehr schwer'};
+const moonOf = level => Math.floor(level / 5);  // RunManager: (levelsCompleted + 1) / 5
+const stuns = (it, enemy, level) => enemy.objectHurtStun && it.mass >= STUN_MASS[enemy.weight] + (moonOf(level) >= 1 ? 0 : -1.5);
+
+// Preisverteilung wie ValuableObject.DollarValueSetLogic: Random.Range -> runden -> auf 100 runden
+function spawnDist(it) {
+  if (it.presetLo == null) return [];
+  const w = new Map();
+  for (let x = Math.round(it.presetLo); x <= Math.round(it.presetHi); x++) {
+    const share = Math.max(0, Math.min(x + 0.5, it.presetHi) - Math.max(x - 0.5, it.presetLo));
+    const k = rint(x / 100) * 100;
+    w.set(k, (w.get(k) || 0) + share);
+  }
+  const total = it.presetHi - it.presetLo;
+  return [...w].map(([v, s]) => ({v, p: s / total})).filter(d => d.p > 0).sort((a, b) => a.v - b.v);
+}
+
+// ---------- Helfer ----------
+const fmt = n => '$' + Math.round(n).toLocaleString('de-DE');
+const pct = x => (x * 100).toLocaleString('de-DE', {maximumFractionDigits: x < 0.1 ? 1 : 0}) + ' %';
+const num = (x, d = 2) => x.toLocaleString('de-DE', {maximumFractionDigits: d});
 const priceText = it => it.hi == null ? fmt(it.lo) + '+' : fmt(it.lo) + '–' + fmt(it.hi);
 const vtName = it => it.vt || SPECIAL;
 const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const norm = s => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, ' ').trim();
-ITEMS.forEach((it, i) => { it.id = i; it.key = norm(it.name); });
+ITEMS.forEach((it, i) => {
+  it.id = i; it.key = norm(it.name);
+  it.maxDmg = enemyDamage(3, it.mass, 1);
+  it.label = it.name + ' (' + mapLabel(it.map) + ')';
+});
+const CORRECTED = ITEMS.filter(it => Object.keys(it.wiki).length);
 
 const store = {
   get(k, d) { try { const v = localStorage.getItem('repoval.' + k); return v == null ? d : JSON.parse(v); } catch { return d; } },
   set(k, v) { try { localStorage.setItem('repoval.' + k, JSON.stringify(v)); } catch {} },
 };
-const state = Object.assign({q: '', map: 'all', vt: 'all', size: 'all', sort: 'value', dir: -1, group: 'none', view: 'table'},
-  store.get('state', {}), {q: ''});
-
+// Nur die Darstellung merken; Filter würden beim nächsten Öffnen Items verstecken
+const VIEW_KEYS = ['sort', 'dir', 'group', 'view'];
+const saved = store.get('state', {});
+const state = Object.assign({q: '', map: 'all', vt: 'all', dur: 'all', size: 'all', corr: false, sort: 'value', dir: -1, group: 'none', view: 'table'},
+  Object.fromEntries(VIEW_KEYS.filter(k => k in saved).map(k => [k, saved[k]])));
 const $ = id => document.getElementById(id);
 
-// --- Filter ---
+// ================= Tabs =================
+const TABS = ['valuables', 'schaden', 'level'];
+function showTab(name) {
+  if (!TABS.includes(name)) name = 'valuables';
+  document.querySelectorAll('.tab').forEach(b => b.setAttribute('aria-selected', b.dataset.tab === name));
+  TABS.forEach(t => $('view-' + t).hidden = t !== name);
+  if (location.hash.slice(1) !== name) history.replaceState(null, '', '#' + name);
+}
+document.querySelector('.tabs').onclick = e => { const b = e.target.closest('[data-tab]'); if (b) showTab(b.dataset.tab); };
+window.addEventListener('hashchange', () => showTab(location.hash.slice(1)));
+
+// ================= Tab 1: Liste =================
 function matches(it, opts = state) {
   if (opts.map !== 'all' && it.map !== opts.map) return false;
   if (opts.size !== 'all' && it.size !== opts.size) return false;
   if (opts.vt !== 'all' && vtName(it) !== opts.vt) return false;
+  if (opts.dur !== 'all' && it.dur !== opts.dur) return false;
+  if (opts.corr && !Object.keys(it.wiki).length) return false;
   if (state.q) {
     const words = norm(state.q).split(' ').filter(Boolean);
     const hay = it.key + ' ' + norm(mapLabel(it.map) + ' ' + it.map);
@@ -266,37 +523,33 @@ function matches(it, opts = state) {
 }
 const visible = () => ITEMS.filter(it => matches(it));
 
-// --- Sortierung ---
-const SORTERS = {
-  name: (a, b) => a.name.localeCompare(b.name),
-  value: (a, b) => a.lo - b.lo || (a.hi ?? 1e9) - (b.hi ?? 1e9),
-  max: (a, b) => (a.hi ?? 1e9) - (b.hi ?? 1e9) || a.lo - b.lo,
-  vt: (a, b) => vtSortKey(a) - vtSortKey(b),
-  map: (a, b) => MAPS.findIndex(m => m.key === a.map) - MAPS.findIndex(m => m.key === b.map),
-  size: (a, b) => SIZES.indexOf(a.size) - SIZES.indexOf(b.size),
-  mass: (a, b) => a.mass - b.mass,
-  dmg: (a, b) => a.maxDmg - b.maxDmg,
-};
-// Items ohne festen Typ ordnen sich anhand ihres Mindestwerts zwischen den Typen ein
 function vtSortKey(it) {
   if (it.vt) return VT_INDEX[it.vt];
   let k = 0;
   TYPES.forEach((t, i) => { if (it.lo >= t.lo) k = i + 0.5; });
   return k;
 }
+const SORTERS = {
+  name: (a, b) => a.name.localeCompare(b.name),
+  value: (a, b) => a.lo - b.lo || (a.hi ?? 1e9) - (b.hi ?? 1e9),
+  max: (a, b) => (a.hi ?? 1e9) - (b.hi ?? 1e9) || a.lo - b.lo,
+  vt: (a, b) => vtSortKey(a) - vtSortKey(b),
+  dur: (a, b) => DUR_INDEX[a.dur] - DUR_INDEX[b.dur],
+  map: (a, b) => MAPS.findIndex(m => m.key === a.map) - MAPS.findIndex(m => m.key === b.map),
+  size: (a, b) => SIZES.indexOf(a.size) - SIZES.indexOf(b.size),
+  mass: (a, b) => a.mass - b.mass,
+  dmg: (a, b) => a.maxDmg - b.maxDmg,
+};
 function sorted(list) {
   const f = SORTERS[state.sort];
   return list.slice().sort((a, b) => state.dir * f(a, b) || SORTERS.value(a, b) || a.name.localeCompare(b.name));
 }
 
-// --- Gruppierung ---
 function groups(list) {
-  if (state.group === 'none') return [{title: null, items: list}];
-  const keyOf = {map: it => it.map, vt: it => vtName(it), size: it => it.size}[state.group];
+  if (state.group === 'none') return [{key: null, items: list}];
+  const keyOf = {map: it => it.map, vt: it => vtName(it), dur: it => it.dur, size: it => it.size}[state.group];
   const order = {
-    map: MAPS.map(m => m.key),
-    vt: [...TYPES.map(t => t.name), SPECIAL],
-    size: SIZES,
+    map: MAPS.map(m => m.key), vt: [...TYPES.map(t => t.name), SPECIAL], dur: DURS.map(d => d.name), size: SIZES,
   }[state.group];
   const by = new Map(order.map(k => [k, []]));
   list.forEach(it => by.get(keyOf(it)).push(it));
@@ -308,8 +561,9 @@ function groupTitle(g) {
   if (state.group === 'map') return `<span class="dot" style="--c:${MAP_BY[g.key].color}"></span>${esc(mapLabel(g.key))}`;
   if (state.group === 'vt') {
     const t = TYPES.find(t => t.name === g.key);
-    return `<span class="vt" style="--vc:${vtColor(g.key)}">${esc(g.key)}</span>` + (t ? ` <span class="gmeta">${fmt(t.lo)}–${fmt(t.hi)}</span>` : '');
+    return `<span class="vt" style="--vc:${vtColor(g.key)}">${esc(g.key)}</span>` + (t ? ` <span class="gmeta">${fmt(t.spawn[0])}–${fmt(t.spawn[1])}</span>` : '');
   }
+  if (state.group === 'dur') return durBadge(g.key);
   return esc(g.key);
 }
 function rangeSum(items) {
@@ -319,7 +573,6 @@ function rangeSum(items) {
   return `${items.length} Items · im Schnitt ${fmt(Math.round((lo + hi) / 2 / items.length / 100) * 100)}${open ? ' (mind.)' : ''}`;
 }
 
-// --- Darstellung ---
 function hl(text) {
   if (!state.q) return esc(text);
   const words = norm(state.q).split(' ').filter(Boolean);
@@ -332,8 +585,11 @@ function hl(text) {
 }
 const mapCell = it => `<span class="mapname" title="${esc(mapLabel(it.map))}"><span class="dot" style="--c:${MAP_BY[it.map].color}"></span><span class="mt">${esc(mapLabel(it.map))}</span></span>`;
 const vtBadge = it => `<span class="vt" style="--vc:${vtColor(it.vt)}">${esc(vtName(it))}</span>`;
+const durBadge = d => `<span class="vt" style="--vc:${durColor(d)}">${esc(d)}</span>`;
 const trapTag = it => it.trap ? '<span class="tag trap" title="Trap: macht Lärm">Trap</span>' : '';
+const fixTag = (it, field) => it.wiki[field] ? `<span class="tag fix" title="Wiki sagt: ${esc(it.wiki[field])} – laut Spieldaten korrigiert">korr.</span>` : '';
 const thumb = it => it.img ? `<img class="thumb" src="${it.img}" alt="" loading="lazy">` : '<div class="thumb"></div>';
+const massText = it => num(it.mass) + ' kg';
 
 const COLS = [
   {key: null, label: '', cls: 'img'},
@@ -341,6 +597,7 @@ const COLS = [
   {key: 'map', label: 'Map'},
   {key: 'vt', label: 'Value Type', cls: 'hide-xs'},
   {key: 'value', label: 'Wert', cls: 'num'},
+  {key: 'dur', label: 'Haltbarkeit', cls: 'hide-xs'},
   {key: 'size', label: 'Größe', cls: 'hide-md'},
   {key: 'mass', label: 'Masse', cls: 'num hide-md'},
   {key: 'dmg', label: 'Schaden', cls: 'num hide-md'},
@@ -358,10 +615,11 @@ function renderTable(gs) {
         <td><span class="name">${hl(it.name)}</span>${trapTag(it)}</td>
         <td>${mapCell(it)}</td>
         <td class="hide-xs">${vtBadge(it)}</td>
-        <td class="num">${priceText(it)}</td>
-        <td class="hide-md">${esc(it.size)}</td>
-        <td class="num hide-md">${esc(it.massText.startsWith('Varies') ? '≤ ' + it.mass : it.mass)} kg</td>
-        <td class="num hide-md">${it.maxDmg}</td>
+        <td class="num">${priceText(it)}${fixTag(it, 'value')}</td>
+        <td class="hide-xs">${durBadge(it.dur)}</td>
+        <td class="hide-md">${esc(it.size)}${fixTag(it, 'size')}</td>
+        <td class="num hide-md">${massText(it)}${fixTag(it, 'mass')}</td>
+        <td class="num hide-md" title="Schaden an Monstern bei schwerem Aufprall">${it.maxDmg}</td>
       </tr>`;
     });
   });
@@ -375,8 +633,8 @@ function renderCards(gs) {
     g.items.forEach(it => {
       h += `<button class="card" data-id="${it.id}">${thumb(it)}<div class="meta">
         <div class="name">${hl(it.name)}${trapTag(it)}</div>
-        <div class="price">${priceText(it)}</div>
-        <div>${vtBadge(it)}</div>
+        <div class="price">${priceText(it)}${fixTag(it, 'value')}</div>
+        <div>${vtBadge(it)} ${durBadge(it.dur)}</div>
         <div>${mapCell(it)}</div>
       </div></button>`;
     });
@@ -391,79 +649,87 @@ function renderChips() {
     `<button class="chip" data-map="${esc(m.key)}" aria-pressed="${state.map === m.key}">${m.color ? `<span class="dot" style="--c:${m.color}"></span>` : ''}${esc(m.label || m.key)}<span class="n">${cnt('map', m.key)}</span></button>`).join('');
   $('sizes').innerHTML = ['all', ...SIZES].map(s =>
     `<button class="chip" data-size="${esc(s)}" aria-pressed="${state.size === s}">${s === 'all' ? 'Alle' : esc(s)}<span class="n">${cnt('size', s)}</span></button>`).join('');
-  const sel = $('vt');
   const vtCnt = v => ITEMS.filter(it => matches(it, others('vt')) && vtName(it) === v).length;
-  sel.innerHTML = `<option value="all">Alle</option>` + [...TYPES.map(t => t.name), SPECIAL].map(v =>
+  $('vt').innerHTML = `<option value="all">Alle</option>` + [...TYPES.map(t => t.name), SPECIAL].map(v =>
     `<option value="${esc(v)}">${esc(v)} (${vtCnt(v)})</option>`).join('');
-  sel.value = state.vt;
+  $('vt').value = state.vt;
+  const durCnt = v => ITEMS.filter(it => matches(it, others('dur')) && it.dur === v).length;
+  $('dur').innerHTML = `<option value="all">Alle</option>` + DURS.map(d =>
+    `<option value="${esc(d.name)}">${esc(d.name)} (${durCnt(d.name)})</option>`).join('');
+  $('dur').value = state.dur;
+  $('corrOnly').setAttribute('aria-pressed', state.corr);
+  $('corrN').textContent = CORRECTED.length;
 }
 
 function renderLegend() {
   const vtCnt = v => ITEMS.filter(it => vtName(it) === v).length;
   $('legend').innerHTML = TYPES.map(t => `<button class="lrow" data-vt="${esc(t.name)}">
       <span class="vt" style="--vc:${vtColor(t.name)}">${esc(t.name)}</span>
-      <span class="r">${fmt(t.lo)}–${fmt(t.hi)}</span><span class="c">${vtCnt(t.name)} Items</span></button>`).join('') +
+      <span class="r" title="Preset im Spiel: ${fmt(t.lo)}–${fmt(t.hi)}">${fmt(t.spawn[0])}–${fmt(t.spawn[1])}</span><span class="c">${vtCnt(t.name)} Items</span></button>`).join('') +
     `<button class="lrow" data-vt="${SPECIAL}"><span class="vt" style="--vc:${vtColor(null)}">${SPECIAL}</span>
-      <span class="r">eigene Spanne</span><span class="c">${vtCnt(SPECIAL)} Items</span></button>`;
+      <span class="r">Geldsäcke</span><span class="c">${vtCnt(SPECIAL)} Items</span></button>`;
+  $('durLegend').innerHTML = DURS.map(d => `<button class="lrow" data-dur="${esc(d.name)}">
+      ${durBadge(d.name)}
+      <span class="r">${[1, 2, 3].map(l => pct(lossFactor(l, d.durab))).join(' / ')}</span>
+      <span class="c">bricht ab ${num(breakSpeed(1, d.frag, 1))} m/s · ${ITEMS.filter(it => it.dur === d.name).length} Items</span></button>`).join('');
 }
 
 function render() {
   const list = sorted(visible());
   const gs = groups(list);
   renderChips();
-  $('q').value !== state.q && ($('q').value = state.q);
+  if ($('q').value !== state.q) $('q').value = state.q;
   $('searchBox').classList.toggle('has', !!state.q);
   $('sort').value = state.sort;
   $('group').value = state.group;
   $('dir').textContent = state.dir > 0 ? '↑' : '↓';
   $('view').textContent = state.view === 'table' ? 'Karten' : 'Tabelle';
-
-  if (!list.length) {
-    $('out').innerHTML = `<div class="empty">Nichts gefunden${state.q ? ` für „${esc(state.q)}“` : ''}. Filter zurücksetzen?</div>`;
-  } else {
-    $('out').innerHTML = state.view === 'table' ? renderTable(gs) : renderCards(gs);
-  }
+  $('out').innerHTML = !list.length
+    ? `<div class="empty">Nichts gefunden${state.q ? ` für „${esc(state.q)}“` : ''}. Filter zurücksetzen?</div>`
+    : state.view === 'table' ? renderTable(gs) : renderCards(gs);
   const lo = list.reduce((s, it) => s + it.lo, 0), hi = list.reduce((s, it) => s + (it.hi ?? it.lo), 0);
   const top = list.slice().sort((a, b) => (b.hi ?? b.lo) - (a.hi ?? a.lo))[0];
   $('summary').innerHTML = `<span><b>${list.length}</b> von ${ITEMS.length} Valuables</span>` +
     (list.length ? `<span>Billigstes ab <b>${fmt(Math.min(...list.map(i => i.lo)))}</b></span>
       <span>Teuerstes: <b>${esc(top.name)}</b> bis ${priceText(top).split('–').pop()}</span>
-      <span>Ø Wert <b>${fmt(Math.round((lo + hi) / 2 / list.length / 100) * 100)}</b></span>` : '');
-  const {q, ...persist} = state;
-  store.set('state', persist);
+      <span>Ø Wert <b>${fmt(Math.round((lo + hi) / 2 / list.length / 100) * 100)}</b></span>` : '') +
+    `<span><b>${CORRECTED.length}</b> Wiki-Angaben laut Spieldaten korrigiert</span>`;
+  store.set('state', Object.fromEntries(VIEW_KEYS.map(k => [k, state[k]])));
 }
 
-// --- Detail ---
+// ---------- Detail ----------
 function openItem(id) {
   const it = ITEMS[id];
-  const dmg = it.dmg.split('/');
-  const stunsBig = it.maxDmg >= 30;
   const same = ITEMS.filter(o => o.map === it.map && o.id !== it.id && vtName(o) === vtName(it)).map(o => o.name);
-  const t = TYPES.find(t => t.name === it.vt);
+  const dist = spawnDist(it);
+  const fixes = Object.entries(it.wiki).map(([k, v]) => `${{value: 'Wert', mass: 'Masse', size: 'Größe'}[k]}: Wiki sagt ${esc(v)}`);
   $('dlg').innerHTML = `
     <div class="dlg-head">${it.img ? `<img src="${it.img}" alt="">` : ''}
-      <div><h3>${esc(it.name)}</h3>${vtBadge(it)} ${trapTag(it)}</div>
+      <div><h3>${esc(it.name)}</h3>${vtBadge(it)} ${durBadge(it.dur)} ${trapTag(it)}</div>
       <button class="x" id="dlgClose" aria-label="Schließen">&times;</button></div>
     <div class="dlg-body"><dl>
       <dt>Spawnt in</dt><dd>${mapCell(it)}${it.map === 'Any' ? ' (alle Maps)' : ' (nur hier)'}</dd>
-      <dt>Wert</dt><dd><b>${priceText(it)}</b>${t && (t.lo !== it.lo || t.hi !== it.hi) ? ` <span class="tag">Typ offiziell ${fmt(t.lo)}–${fmt(t.hi)}</span>` : ''}</dd>
-      <dt>Value Type</dt><dd>${esc(vtName(it))}</dd>
-      <dt>Größe</dt><dd>${esc(it.size)}</dd>
-      <dt>Masse</dt><dd>${esc(it.massText)}${/^[\d.]+$/.test(it.massText) ? ' kg' : ''}</dd>
-      <dt>Schaden</dt><dd>${/\d+\/\d+/.test(it.dmg) ? `<div class="dmg">${dmg.map(d => `<span>${esc(d)}</span>`).join('')}</div>` : esc(it.dmg)}</dd>
-      <dt>Große Gegner</dt><dd>${stunsBig ? 'kann sie betäuben (max. Schaden ≥ 30)' : 'betäubt nur kleine Gegner'}</dd>
+      <dt>Wert</dt><dd><b>${priceText(it)}</b>${it.presetLo != null && (it.presetLo !== it.lo || it.presetHi !== it.hi) ? ` <span class="tag">Preset ${fmt(it.presetLo)}–${fmt(it.presetHi)}</span>` : ''}</dd>
+      ${dist.length > 1 && dist.length <= 12 ? `<dt>Kommt vor als</dt><dd><div class="dist">${dist.map(d => `<span>${fmt(d.v)} · ${pct(d.p)}</span>`).join('')}</div></dd>` : ''}
+      <dt>Größe</dt><dd>${esc(it.size)}${it.volume !== it.size ? ` <span class="tag" title="Zählt beim Monster-Treffer">intern ${esc(it.volume)}</span>` : ''}</dd>
+      <dt>Masse</dt><dd>${massText(it)}</dd>
+      <dt>Haltbarkeit</dt><dd>${esc(it.dur)}: bricht ab ${num(breakSpeed(1, it.frag, 1))} m/s Tempoverlust, Stoß kostet ${[1, 2, 3].map(l => pct(lossFactor(l, it.durab))).join(' / ')}</dd>
+      <dt>Schaden</dt><dd>Monster ${[1, 2, 3].map(l => enemyDamage(l, it.mass, 1)).join(' / ')} · Spieler ${[1, 2, 3].map(l => playerDamage(l, it.mass)).join(' / ')}</dd>
     </dl>
+    ${fixes.length ? `<div class="note"><b>Korrigiert</b> · ${fixes.join(' · ')}. Angezeigt werden die Werte aus den Spieldaten.</div>` : ''}
+    ${it.massNote ? `<div class="note">${esc(it.massNote)}</div>` : ''}
     ${it.trap ? `<div class="note"><b>Trap</b> · Auslöser: ${esc(it.trap.trigger)} · Lärmradius ${esc(it.trap.noise)}<br>${esc(it.trap.desc)}</div>` : ''}
     ${NOTES[it.name] ? `<div class="note">${esc(NOTES[it.name])}</div>` : ''}
     ${same.length ? `<div class="note">Gleicher Value Type auf dieser Map: ${same.map(esc).join(', ')}</div>` : ''}
     </div>
-    <div class="dlg-foot"><a href="${it.url}" target="_blank" rel="noopener">Wiki-Seite öffnen ↗</a><span style="color:var(--muted);font-size:13px">Schaden: leichter / mittlerer / starker / sehr starker Aufprall</span></div>`;
+    <div class="dlg-foot"><a href="${it.url}" target="_blank" rel="noopener">Wiki-Seite öffnen ↗</a>
+      <button class="btn primary" id="dlgCalc">Im Schadens-Rechner öffnen</button></div>`;
   $('dlg').showModal();
   $('dlgClose').onclick = () => $('dlg').close();
+  $('dlgCalc').onclick = () => { $('dlg').close(); dmgSelect(it); showTab('schaden'); window.scrollTo(0, 0); };
 }
 $('dlg').addEventListener('click', e => { if (e.target === $('dlg')) $('dlg').close(); });
 
-// --- Events ---
 $('q').addEventListener('input', e => { state.q = e.target.value; render(); });
 $('q').addEventListener('keydown', e => {
   if (e.key === 'Escape') { state.q = ''; render(); }
@@ -472,20 +738,27 @@ $('q').addEventListener('keydown', e => {
 });
 $('clearQ').onclick = () => { state.q = ''; render(); $('q').focus(); };
 document.addEventListener('keydown', e => {
-  if (e.key === '/' && document.activeElement !== $('q') && !$('dlg').open) { e.preventDefault(); $('q').focus(); }
+  if (e.key === '/' && !$('view-valuables').hidden && !['INPUT', 'SELECT'].includes(document.activeElement.tagName) && !$('dlg').open) {
+    e.preventDefault(); $('q').focus();
+  }
 });
 $('vt').onchange = e => { state.vt = e.target.value; render(); };
+$('dur').onchange = e => { state.dur = e.target.value; render(); };
 $('sort').onchange = e => { state.sort = e.target.value; state.dir = ['name', 'map', 'size'].includes(state.sort) ? 1 : -1; render(); };
 $('dir').onclick = () => { state.dir *= -1; render(); };
 $('group').onchange = e => { state.group = e.target.value; render(); };
 $('view').onclick = () => { state.view = state.view === 'table' ? 'cards' : 'table'; render(); };
+$('corrOnly').onclick = () => { state.corr = !state.corr; render(); };
 $('maps').onclick = e => { const b = e.target.closest('[data-map]'); if (b) { state.map = b.dataset.map; render(); } };
 $('sizes').onclick = e => { const b = e.target.closest('[data-size]'); if (b) { state.size = b.dataset.size; render(); } };
-$('legend').onclick = e => {
-  const b = e.target.closest('[data-vt]'); if (!b) return;
-  state.vt = state.vt === b.dataset.vt ? 'all' : b.dataset.vt; render();
+function legendClick(e) {
+  const b = e.target.closest('[data-vt],[data-dur]'); if (!b) return;
+  const k = b.dataset.vt != null ? 'vt' : 'dur', v = b.dataset[k];
+  state[k] = state[k] === v ? 'all' : v; render();
   document.querySelector('.controls').scrollIntoView({behavior: 'smooth'});
-};
+}
+$('legend').onclick = legendClick;
+$('durLegend').onclick = legendClick;
 $('out').onclick = e => {
   const th = e.target.closest('th[data-sort]');
   if (th) {
@@ -493,14 +766,257 @@ $('out').onclick = e => {
     if (state.sort === k) state.dir *= -1; else { state.sort = k; state.dir = ['name', 'map', 'size'].includes(k) ? 1 : -1; }
     return render();
   }
-  if (e.target.closest('.empty')) { Object.assign(state, {q: '', map: 'all', vt: 'all', size: 'all'}); return render(); }
+  if (e.target.closest('.empty')) { Object.assign(state, {q: '', map: 'all', vt: 'all', dur: 'all', size: 'all', corr: false}); return render(); }
   const row = e.target.closest('[data-id]');
   if (row) openItem(+row.dataset.id);
 };
 
+// ================= Tab 2: Schadens-Rechner =================
+const dmg = {item: null, value: 0, current: 0, log: []};
+$('itemList').innerHTML = ITEMS.slice().sort((a, b) => a.name.localeCompare(b.name)).map(it => `<option value="${esc(it.label)}">`).join('');
+$('dLevel').innerHTML = Array.from({length: 20}, (_, i) => i + 1).map(n => `<option value="${n}">Level ${n}${n === 20 ? '+' : ''}${n === 5 ? ' (Crescent Moon)' : ''}</option>`).join('');
+$('dEnemy').innerHTML = ENEMIES.map((e, i) => `<option value="${i}">${esc(e.name)} – ${WEIGHT_DE[e.weight]}, ${e.health} HP</option>`).join('');
+$('dEnemy').value = Math.max(0, ENEMIES.findIndex(e => e.name === 'Huntsman'));
+const dMod = () => +document.querySelector('input[name=dMod]:checked').value;
+
+function dmgSelect(it) {
+  dmg.item = it;
+  $('dItem').value = it.label;
+  const r = $('dValue');
+  if (it.surplus) { r.min = 100; r.max = 20000; } else { r.min = it.lo; r.max = it.hi ?? it.lo; }
+  dmg.value = it.surplus ? 5000 : Math.round((it.lo + (it.hi ?? it.lo)) / 200) * 100;
+  r.value = dmg.value;
+  r.disabled = r.min === r.max;
+  store.set('dmgItem', it.label);
+  dmgReset();
+}
+function dmgReset() { dmg.current = dmg.value; dmg.log = []; dmgRender(); }
+
+function lossTile(lvl, it, value, mod) {
+  if (mod === 0) return `<div class="tile l${lvl}"><div class="k">${BREAK_NAMES[lvl - 1]}</div><div class="v">$0</div><div class="s">unzerstörbar</div></div>`;
+  const loss = Math.min(lossOf(lvl, it, value), value);
+  const spread = rint(loss * 0.1);
+  let left = value, n = 0;
+  while (left >= value * 0.15 && n < 999) { left -= Math.max(lossOf(lvl, it, value), lvl === 3 ? 1 : 0); n++; }
+  return `<div class="tile l${lvl}"><div class="k">${BREAK_ADJ[lvl - 1]} Stoß</div>
+    <div class="v">−${fmt(loss)}</div>
+    <div class="s">${pct(lossFactor(lvl, it.durab))} vom Startwert${spread ? `, ±${fmt(spread)}` : ''}</div>
+    <div class="s">${loss >= value * 0.85 ? '<b class="no">sofort zerstört</b>' : `nach ${n} solchen Stößen zerstört`}</div></div>`;
+}
+
+function dmgRender() {
+  const it = dmg.item; if (!it) return;
+  const mod = dMod(), level = +$('dLevel').value, enemy = ENEMIES[+$('dEnemy').value];
+  $('dPick').innerHTML = `${it.img ? `<img src="${it.img}" alt="">` : ''}<div><div class="name">${esc(it.name)}</div>
+    <div>${mapCell(it)}</div><div style="margin-top:4px">${vtBadge(it)} ${durBadge(it.dur)}</div>
+    <div class="hint" style="color:var(--muted);font-size:13px;margin-top:4px">${massText(it)} · ${esc(it.size)} · ${priceText(it)}</div></div>`;
+  $('dValueOut').textContent = fmt(dmg.value);
+  $('dValueHint').textContent = it.surplus ? 'Geldsack: Wert = Überschuss am Extraction Point' : `Spawnt mit ${priceText(it)}`;
+
+  $('dBreak').innerHTML = mod === 0
+    ? '<div class="tile hl"><div class="k">Unzerstörbar</div><div class="v">bricht nie</div><div class="s">verliert keinen Wert</div></div>'
+    : [1, 2, 3].map(l => {
+        const v = breakSpeed(l, it.frag, mod);
+        return `<div class="tile l${l}"><div class="k">${BREAK_ADJ[l - 1]} Bruch ab</div><div class="v">${num(v)} m/s</div>
+          <div class="s">${num(v * 3.6, 1)} km/h Tempoverlust in 1/50 s</div></div>`;
+      }).join('');
+  $('dLoss').innerHTML = [1, 2, 3].map(l => lossTile(l, it, dmg.value, mod)).join('');
+
+  // Simulation
+  const share = dmg.current / dmg.value;
+  $('dSimHead').innerHTML = `<div class="tiles"><div class="tile hl"><div class="k">Noch wert</div><div class="v">${fmt(dmg.current)}</div>
+    <div class="s">${dmg.current ? pct(share) + ' vom Startwert ' + fmt(dmg.value) : '<b class="no">zerstört</b>'}</div></div>
+    <div class="tile"><div class="k">Verloren</div><div class="v">${fmt(dmg.value - dmg.current)}</div><div class="s">${dmg.log.length} Treffer · zerstört unter ${fmt(dmg.value * 0.15)}</div></div></div>`;
+  $('dBar').querySelector('i').style.width = (share * 100) + '%';
+  $('dBar').classList.toggle('low', share < 0.4);
+  $('dLog').innerHTML = dmg.log.map(l => `<div><span>${esc(l.what)}</span><span>${l.text}</span></div>`).join('');
+
+  // Monster und Spieler
+  const levelRows = [1, 2, 3].map(l => {
+    const d = enemyDamage(l, it.mass, enemy.objectHurtMultiplier);
+    return `<tr><td>${BREAK_NAMES[l - 1]}</td><td class="num">${enemy.objectHurt ? d : '–'}</td>
+      <td class="num">${enemy.objectHurt && d > 0 ? Math.ceil(enemy.health / d) + '×' : '–'}</td>
+      <td class="num">${playerDamage(l, it.mass)}</td></tr>`;
+  }).join('');
+  const minShare = ENEMY_HIT_MIN[it.volume];
+  const hitLoss = Math.max(lossOf(3, it, dmg.value), Math.ceil(dmg.value * minShare));
+  const stun = stuns(it, enemy, level);
+  const need = STUN_MASS[enemy.weight] + (moonOf(level) >= 1 ? 0 : -1.5);
+  $('dEnemyOut').innerHTML = `
+    <div class="tiles">
+      <div class="tile"><div class="k">${esc(enemy.name)}</div><div class="v">${enemy.health} HP</div><div class="s">${WEIGHT_DE[enemy.weight]}${enemy.objectHurtMultiplier !== 1 ? ` · nimmt ×${num(enemy.objectHurtMultiplier)} Schaden` : ''}</div></div>
+      <div class="tile"><div class="k">Betäubt?</div><div class="v ${stun ? 'yes' : 'no'}">${stun ? 'ja, 2 s' : 'nein'}</div>
+        <div class="s">${enemy.objectHurtStun ? `braucht ab ${num(Math.max(need, 0))} kg, Item hat ${num(it.mass)} kg` : 'lässt sich durch Gegenstände nicht betäuben'}</div></div>
+      <div class="tile"><div class="k">Item verliert dabei</div><div class="v">${mod === 0 ? '$0' : '−' + fmt(Math.min(hitLoss, dmg.value))}</div>
+        <div class="s">${mod === 0 ? 'unzerstörbar' : `mind. ${pct(minShare)} (${esc(it.volume)}) ±5 %`}</div></div>
+    </div>
+    ${enemy.objectHurt ? '' : `<div class="note"><b>${esc(enemy.name)}</b> kann laut Spieldaten von geworfenen Gegenständen keinen Schaden nehmen.</div>`}
+    <table><thead><tr><th>Aufprall</th><th class="num">Schaden Monster</th><th class="num">Treffer bis tot</th><th class="num">Schaden Spieler</th></tr></thead>
+    <tbody>${levelRows}</tbody></table>
+    <div class="note">Ein Monster-Treffer zählt nur, wenn das Item schneller als 2 m/s fliegt, ein Spieler-Treffer ab 3 m/s. Spieler haben normal 100 HP.</div>`;
+}
+
+function dmgHit(kind) {
+  const it = dmg.item, mod = dMod();
+  if (kind === 'reset') return dmgReset();
+  if (!dmg.current) return;
+  const orig = dmg.value;
+  let lost = 0, what;
+  if (mod !== 0) {
+    const lvl = kind === 'enemy' ? 3 : +kind;
+    lost = lossOf(lvl, it, orig);
+    lost += rint((Math.random() * 2 - 1) * lost * 0.1);
+    if (kind === 'enemy') lost = Math.max(lost, Math.ceil(orig * (ENEMY_HIT_MIN[it.volume] + (Math.random() * 0.1 - 0.05))));
+    lost = Math.max(Math.min(lost, dmg.current), lvl === 3 ? 1 : 0);
+  }
+  what = kind === 'enemy' ? 'Monster getroffen' : ['Leichter', 'Mittlerer', 'Schwerer'][kind - 1] + ' Stoß';
+  dmg.current -= lost;
+  let text = '−' + fmt(lost);
+  if (dmg.current < orig * 0.15) { text = `−${fmt(lost + dmg.current)} · zerstört`; dmg.current = 0; }
+  dmg.log.push({what, text});
+  dmgRender();
+}
+
+function dmgPickFromInput() {
+  const v = $('dItem').value.trim().toLowerCase();
+  const it = ITEMS.find(i => i.label.toLowerCase() === v) || ITEMS.find(i => i.name.toLowerCase() === v);
+  if (it && it !== dmg.item) dmgSelect(it);
+}
+$('dItem').addEventListener('change', dmgPickFromInput);
+$('dItem').addEventListener('input', dmgPickFromInput);
+$('dItem').addEventListener('focus', e => e.target.select());
+$('dValue').addEventListener('input', e => { dmg.value = +e.target.value; dmgReset(); });
+['dLevel', 'dEnemy'].forEach(id => $(id).addEventListener('change', () => { store.set(id, $(id).value); dmgRender(); }));
+document.querySelectorAll('input[name=dMod]').forEach(r => r.addEventListener('change', dmgRender));
+document.querySelector('#view-schaden .btnrow').onclick = e => { const b = e.target.closest('[data-hit]'); if (b) dmgHit(b.dataset.hit); };
+
+// ================= Tab 3: Level-Geld =================
+// Unity AnimationCurve.Evaluate: Hermite-Spline, mit Gewichten als Bezier
+function evalCurve(keys, x) {
+  if (x <= keys[0].time) return keys[0].value;
+  if (x >= keys[keys.length - 1].time) return keys[keys.length - 1].value;
+  let i = 0;
+  while (x > keys[i + 1].time) i++;
+  const a = keys[i], b = keys[i + 1], dx = b.time - a.time, t = (x - a.time) / dx;
+  const m0 = a.outSlope * dx, m1 = b.inSlope * dx;
+  const wo = (a.weightedMode & 2) !== 0, wi = (b.weightedMode & 1) !== 0;
+  if (!wo && !wi) {
+    const t2 = t * t, t3 = t2 * t;
+    return (2 * t3 - 3 * t2 + 1) * a.value + (t3 - 2 * t2 + t) * m0 + (-2 * t3 + 3 * t2) * b.value + (t3 - t2) * m1;
+  }
+  const w0 = wo ? a.outWeight : 1 / 3, w1 = wi ? b.inWeight : 1 / 3;
+  const y0 = a.value, y1 = y0 + w0 * m0, y3 = b.value, y2 = y3 - w1 * m1;
+  let lo = 0, hi = 1, u = 0.5;
+  for (let k = 0; k < 60; k++) {
+    u = (lo + hi) / 2;
+    const bx = 3 * (1 - u) ** 2 * u * w0 + 3 * (1 - u) * u * u * (1 - w1) + u ** 3;
+    if (bx < t) lo = u; else hi = u;
+  }
+  return (1 - u) ** 3 * y0 + 3 * (1 - u) ** 2 * u * y1 + 3 * (1 - u) * u * u * y2 + u ** 3 * y3;
+}
+
+function levelInfo(n) {
+  const done = n - 1;  // levelsCompleted
+  const d1 = Math.min(Math.max(done / 9, 0), 1), d2 = Math.min(Math.max((done - 9) / 10, 0), 1);
+  const modules = Math.min(5 + done, 10) + (done >= 10 ? Math.min(done - 9, 5) : 0);
+  const extra = modules >= 15 ? 4 : modules >= 10 ? 3 : modules >= 8 ? 2 : modules >= 6 ? 1 : 0;
+  const second = d2 > 0, t = second ? d2 : d1, s = second ? '2' : '1';
+  const c = evalCurve(CURVES['haulGoalCurve' + s], t);
+  return {
+    n, modules, points: extra + 1, curve: s, t, c, share: 0.7 * c, multiplier: (extra + 1) / (0.7 * c),
+    maxValue: rint(evalCurve(CURVES['totalMaxValueCurve' + s], t)),
+    amounts: SIZE_KEYS.map(k => rint(evalCurve(CURVES[k + 'MaxAmountCurve' + s], t))),
+  };
+}
+const LEVELS = Array.from({length: 20}, (_, i) => levelInfo(i + 1));
+
+// Rückwärts: welche Level-Gesamtwerte (Vielfache von 100) ergeben genau dieses Ziel pro Punkt?
+// Spiel: haulGoal = (int)(haulGoalMax * 0.7f * kurve), pro Punkt = haulGoal / Punkte (Ganzzahl)
+function levelTotals(info, goal) {
+  const f = Math.fround, perPoint = v => Math.trunc(Math.trunc(f(f(f(v) * f(0.7)) * f(info.c))) / info.points);
+  const guess = Math.round(goal * info.points / info.share / 100) * 100;
+  const hits = [];
+  let near = guess, nearDiff = Infinity;
+  for (let v = Math.max(0, guess - 2000); v <= guess + 2000; v += 100) {
+    const diff = Math.abs(perPoint(v) - goal);
+    if (!diff) hits.push(v);
+    if (diff < nearDiff) { near = v; nearDiff = diff; }
+  }
+  return {hits, near, nearDiff};
+}
+
+const lvl = {n: +store.get('lvlN', 1), goal: store.get('lvlGoal', '')};
+$('lLevels').innerHTML = LEVELS.map(l => `<button class="chip" data-n="${l.n}">${l.n === 20 ? '20+' : l.n}</button>`).join('');
+$('lLevels').onclick = e => { const b = e.target.closest('[data-n]'); if (b) { lvl.n = +b.dataset.n; store.set('lvlN', lvl.n); levelRender(); } };
+$('lGoal').value = lvl.goal;
+$('lGoal').addEventListener('input', e => { lvl.goal = e.target.value; store.set('lvlGoal', lvl.goal); levelRender(); });
+
+function levelRender() {
+  const info = LEVELS[lvl.n - 1];
+  document.querySelectorAll('#lLevels .chip').forEach(b => b.setAttribute('aria-pressed', +b.dataset.n === lvl.n));
+  const goal = Math.floor(+lvl.goal);
+  const name = lvl.n === 20 ? 'Level 20+' : 'Level ' + lvl.n;
+  const tiles = [
+    `<div class="tile"><div class="k">Extraction Points</div><div class="v">${info.points}</div><div class="s">${info.modules} Module · ${name}</div></div>`,
+    `<div class="tile"><div class="k">Multiplikator</div><div class="v">× ${num(info.multiplier, 3)}</div><div class="s">Ziel = ${pct(info.share)} vom Levelwert</div></div>`,
+  ];
+  if (goal > 0) {
+    const {hits, near, nearDiff} = levelTotals(info, goal);
+    const total = goal * info.points;
+    const money = hits.length ? (hits.length === 1 ? fmt(hits[0]) : `${fmt(hits[0])}–${fmt(hits[hits.length - 1])}`) : '≈ ' + fmt(near);
+    const lowest = hits.length ? hits[0] : near;
+    tiles.unshift(
+      `<div class="tile hl"><div class="k">Geld im Level</div><div class="v">${money}</div><div class="s">Wert aller Valuables beim Start</div></div>`,
+      `<div class="tile"><div class="k">Gesamtziel</div><div class="v">${fmt(total)}</div><div class="s">${info.points} × ${fmt(goal)}</div></div>`,
+      `<div class="tile"><div class="k">Darf kaputtgehen</div><div class="v">${fmt(Math.max(0, lowest - total))}</div><div class="s">${pct(1 - info.share)} Puffer, alles darüber wird Überschuss</div></div>`);
+    $('lNote').innerHTML = hits.length
+      ? `Rechnet man rückwärts genau wie das Spiel (Float-Rundung, Ganzzahl-Division durch ${info.points}), ${hits.length === 1 ? 'passt nur dieser Gesamtwert' : `passen ${hits.length} Gesamtwerte in 100er-Schritten`} zu einem Ziel von ${fmt(goal)}. Geldsäcke und Orbs von Monstern kommen noch obendrauf.`
+      : `Zu genau ${fmt(goal)} passt kein Gesamtwert in 100er-Schritten (alle Preise sind Vielfache von 100). Am nächsten liegt ${fmt(near)}, das wäre pro Punkt ${fmt(nearDiff)} daneben. ${nearDiff > 3 ? 'Stimmt das Level?' : 'Das kann an der Float-Rundung des Spiels liegen.'}`;
+  } else {
+    $('lNote').innerHTML = `Gib oben ein, wie viel der erste Extraction Point verlangt. Die Seite rechnet daraus aus, wie viel Geld insgesamt im Level liegt.`;
+  }
+  tiles.push(`<div class="tile"><div class="k">Spawn-Grenze</div><div class="v">${fmt(info.maxValue * 1000)}</div><div class="s">ab da hört das Spiel auf, Items zu verteilen (höchstens 50)</div></div>`);
+  $('lOut').innerHTML = tiles.join('');
+  $('lFormula').textContent =
+`Level ${lvl.n === 20 ? '20+' : lvl.n}: abgeschlossene Level = ${lvl.n - 1}
+Kurve        = haulGoalCurve${info.curve}(${num(info.t, 3)}) = ${num(info.c, 4)}
+Gesamtziel   = (int)(Levelwert × 0,7 × ${num(info.c, 4)})  = Levelwert × ${num(info.share, 4)}
+Pro Punkt    = Gesamtziel ÷ ${info.points}  (Ganzzahl)
+Levelwert    ≈ Ziel pro Punkt × ${num(info.multiplier, 4)}
+
+Punkte       = 1 (Startraum) + ${info.points - 1} (aus ${info.modules} Modulen)
+Spawn-Grenze = totalMaxValueCurve${info.curve}(${num(info.t, 3)}) = ${info.maxValue}k`;
+}
+
+function levelTable() {
+  const cell = (code, wiki, digits = 0) => {
+    if (wiki == null) return `<td class="num">${code}</td><td class="num same">–</td>`;
+    // Das Wiki schneidet Multiplikatoren nach 2 Stellen ab (9,0954 -> 9,09), das ist keine Abweichung
+    const same = digits ? Math.abs(code - wiki) < 0.01 : code === wiki;
+    const show = x => digits ? num(x, digits) : x;
+    return `<td class="num">${show(code)}</td><td class="num ${same ? 'same' : 'diff'}">${show(wiki)}</td>`;
+  };
+  let h = `<table><thead><tr><th>Level</th><th class="num">Punkte</th><th class="num">Wiki</th>
+    <th class="num">Multiplikator</th><th class="num">Wiki</th><th class="num">Spawn-Grenze ($k)</th><th class="num">Wiki</th>
+    ${SIZES.map(s => `<th class="num">${s}</th><th class="num">Wiki</th>`).join('')}</tr></thead><tbody>`;
+  LEVELS.forEach(l => {
+    const w = WIKI_LEVELS[l.n] || {};
+    h += `<tr><td>${l.n === 20 ? '20+' : l.n}</td>${cell(l.points, w.extractionPoints)}${cell(l.multiplier, w.multiplier, 3)}${cell(l.maxValue, w.maxValue)}
+      ${l.amounts.map((a, i) => cell(a, w.amounts?.[i])).join('')}</tr>`;
+  });
+  $('lTable').innerHTML = h + '</tbody></table>';
+}
+
+// ================= Start =================
 $('total').textContent = ITEMS.length;
 renderLegend();
 render();
+dmgSelect(ITEMS.find(i => i.label === store.get('dmgItem')) || ITEMS.find(i => i.name === 'Piano') || ITEMS[0]);
+['dLevel', 'dEnemy'].forEach(id => { const v = store.get(id); if (v != null) $(id).value = v; });
+dmgRender();
+levelRender();
+levelTable();
+showTab(location.hash.slice(1));
 </script>
 </body>
 </html>
