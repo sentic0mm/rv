@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>R.E.P.O. Valuables</title>
+<style>
+:root{
+  --bg:#f4f1ea; --panel:#fffdf8; --panel2:#ece7dc; --line:#d9d2c3; --text:#1d1b17; --muted:#6c665b;
+  --accent:#c2410c; --accent-ink:#fff; --mark:#fde68a;
+  --m-headman:#9a3412; --m-mcjannek:#0369a1; --m-museum:#7e22ce; --m-swift:#15803d; --m-any:#a16207;
+  --shadow:0 1px 2px rgba(0,0,0,.06),0 4px 16px rgba(0,0,0,.05);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#121110; --panel:#1b1a18; --panel2:#24221f; --line:#34312c; --text:#ece8df; --muted:#9b958a;
+    --accent:#f97316; --accent-ink:#1a0d03; --mark:#854d0e;
+    --m-headman:#f0875a; --m-mcjannek:#5ab8f0; --m-museum:#c58af5; --m-swift:#5fd38a; --m-any:#e8c14d;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 6px 20px rgba(0,0,0,.3);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#121110; --panel:#1b1a18; --panel2:#24221f; --line:#34312c; --text:#ece8df; --muted:#9b958a;
+  --accent:#f97316; --accent-ink:#1a0d03; --mark:#854d0e;
+  --m-headman:#f0875a; --m-mcjannek:#5ab8f0; --m-museum:#c58af5; --m-swift:#5fd38a; --m-any:#e8c14d;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 6px 20px rgba(0,0,0,.3);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+button,input,select{font:inherit;color:inherit}
+.wrap{max-width:1200px;margin:0 auto;padding:0 16px}
+header{padding:28px 0 12px}
+h1{margin:0;font-size:28px;letter-spacing:.02em}
+h1 span{color:var(--accent)}
+.sub{color:var(--muted);margin-top:4px}
+.sub a{color:inherit}
+
+/* Steuerleiste */
+.controls{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(6px);padding:12px 0;border-bottom:1px solid var(--line)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.row+.row{margin-top:8px}
+.search{position:relative;flex:1 1 280px}
+.search input{width:100%;padding:10px 36px 10px 38px;border:1px solid var(--line);border-radius:10px;background:var(--panel);outline:none}
+.search input:focus{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%,transparent)}
+.search svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);width:18px;height:18px;color:var(--muted)}
+.search kbd{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--muted);border:1px solid var(--line);border-radius:5px;padding:0 5px}
+.search button.clear{position:absolute;right:6px;top:50%;transform:translateY(-50%);border:0;background:none;cursor:pointer;color:var(--muted);font-size:18px;padding:2px 8px;display:none}
+.search.has .clear{display:block}.search.has kbd{display:none}
+select,.btn{padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:var(--panel);cursor:pointer}
+.btn:hover,select:hover{border-color:var(--muted)}
+label.ctl{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:13px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:6px 11px;border:1px solid var(--line);border-radius:999px;background:var(--panel);cursor:pointer;font-size:13.5px;white-space:nowrap}
+.chip .n{color:var(--muted);font-size:12px;font-variant-numeric:tabular-nums}
+.chip[aria-pressed="true"]{background:var(--text);color:var(--bg);border-color:var(--text)}
+.chip[aria-pressed="true"] .n{color:inherit;opacity:.7}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--c,var(--muted));flex:none}
+.chip-label{color:var(--muted);font-size:13px;margin-right:2px;min-width:48px}
+
+.summary{display:flex;flex-wrap:wrap;gap:6px 18px;margin:14px 0 6px;color:var(--muted);font-size:14px}
+.summary b{color:var(--text);font-variant-numeric:tabular-nums}
+
+/* Tabelle */
+table{width:100%;border-collapse:separate;border-spacing:0;background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow)}
+th,td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--line);vertical-align:middle}
+tr:last-child td{border-bottom:0}
+th{font-size:12.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);background:var(--panel2);user-select:none;white-space:nowrap}
+th[data-sort]{cursor:pointer}
+th[data-sort]:hover{color:var(--text)}
+th .ar{display:inline-block;width:1em;color:var(--accent)}
+tbody tr{cursor:pointer}
+tbody tr:hover td{background:color-mix(in srgb,var(--accent) 7%,var(--panel))}
+td.num{font-variant-numeric:tabular-nums;white-space:nowrap}
+td.img{width:56px;padding:4px 8px}
+.thumb{width:44px;height:44px;object-fit:contain;display:block;filter:drop-shadow(0 1px 1px rgba(0,0,0,.3))}
+.name{font-weight:600}
+.mapname{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.vt{display:inline-block;padding:2px 8px;border-radius:6px;font-size:12.5px;font-weight:600;white-space:nowrap;background:color-mix(in srgb,var(--vc) 18%,transparent);color:var(--vc);border:1px solid color-mix(in srgb,var(--vc) 40%,transparent)}
+.tag{display:inline-block;font-size:11px;padding:1px 6px;border-radius:5px;border:1px solid var(--line);color:var(--muted);margin-left:6px;vertical-align:1px}
+.tag.trap{color:var(--accent);border-color:color-mix(in srgb,var(--accent) 50%,transparent)}
+mark{background:var(--mark);color:inherit;border-radius:3px;padding:0 1px}
+tr.group td{background:var(--panel2);font-weight:700;cursor:default;padding:10px}
+tr.group:hover td{background:var(--panel2)}
+tr.group .gmeta{font-weight:400;color:var(--muted);margin-left:10px;font-size:13px}
+
+/* Karten */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px;cursor:pointer;display:flex;gap:10px;box-shadow:var(--shadow);text-align:left;width:100%}
+.card:hover{border-color:var(--accent)}
+.card .thumb{width:56px;height:56px}
+.card .meta{min-width:0;display:flex;flex-direction:column;gap:3px;font-size:13px}
+.card .name{font-size:14.5px}
+.card .price{font-variant-numeric:tabular-nums;font-weight:600}
+.ghead{grid-column:1/-1;margin:12px 0 0;font-size:16px;display:flex;align-items:baseline;gap:10px}
+.ghead:first-child{margin-top:0}
+.ghead .gmeta{font-weight:400;color:var(--muted);font-size:13px}
+.empty{padding:40px;text-align:center;color:var(--muted);background:var(--panel);border:1px dashed var(--line);border-radius:12px}
+
+/* Value-Type-Legende */
+section.legend{margin:28px 0 40px}
+section.legend h2{font-size:18px;margin:0 0 4px}
+section.legend p{color:var(--muted);margin:0 0 12px;font-size:14px}
+.ltable{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:8px}
+.lrow{display:flex;align-items:center;gap:10px;justify-content:space-between;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px 12px;cursor:pointer;text-align:left;width:100%}
+.lrow:hover{border-color:var(--accent)}
+.lrow .r{font-variant-numeric:tabular-nums;color:var(--muted);font-size:13.5px}
+.lrow .c{font-size:12px;color:var(--muted)}
+
+/* Detail-Dialog */
+dialog{border:1px solid var(--line);border-radius:16px;background:var(--panel);color:var(--text);padding:0;width:min(520px,calc(100vw - 32px));box-shadow:0 20px 60px rgba(0,0,0,.4)}
+dialog::backdrop{background:rgba(0,0,0,.5)}
+.dlg-head{display:flex;gap:14px;padding:18px 18px 12px;align-items:center}
+.dlg-head img{width:96px;height:96px;object-fit:contain;background:var(--panel2);border-radius:12px;padding:6px}
+.dlg-head h3{margin:0 0 6px;font-size:21px}
+.dlg-body{padding:0 18px 18px}
+dl{display:grid;grid-template-columns:auto 1fr;gap:7px 14px;margin:0}
+dt{color:var(--muted);font-size:13.5px}
+dd{margin:0;font-variant-numeric:tabular-nums}
+.note{margin-top:14px;padding:10px 12px;border-radius:10px;background:var(--panel2);font-size:13.5px}
+.note b{color:var(--accent)}
+.dlg-foot{display:flex;justify-content:space-between;gap:8px;padding:12px 18px;border-top:1px solid var(--line)}
+.dlg-foot a{color:var(--accent)}
+.x{border:0;background:none;font-size:22px;cursor:pointer;color:var(--muted);margin-left:auto;align-self:flex-start}
+.dmg{display:flex;gap:4px;flex-wrap:wrap}
+.dmg span{padding:1px 7px;border-radius:5px;background:var(--panel2);font-size:13px}
+
+@media (max-width:760px){
+  h1{font-size:23px}
+  .hide-sm{display:none}
+  th.hide-md,td.hide-md{display:none}
+  td.img{width:44px}.thumb{width:36px;height:36px}
+  th,td{padding:7px 6px}
+  .chip-label{min-width:0;width:100%}
+}
+@media (max-width:520px){
+  th.hide-xs,td.hide-xs{display:none}
+  .controls{position:static}
+  td .mapname .mt{display:none}
+  td .mapname{display:flex;justify-content:center}
+  .name{font-size:14px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>R.E.P.O. <span>Valuables</span></h1>
+    <div class="sub">Alle <b id="total"></b> Valuables aus den Leveln &middot; Daten vom <a href="https://repo-2025horror.fandom.com/wiki/Valuables" target="_blank" rel="noopener">R.E.P.O. Wiki</a> &middot; Klick auf ein Item für Details</div>
+  </header>
+</div>
+
+<div class="controls">
+  <div class="wrap">
+    <div class="row">
+      <div class="search" id="searchBox">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input id="q" type="search" placeholder="Item suchen, z.B. Piano, Fish, Potion …" autocomplete="off" spellcheck="false" aria-label="Item suchen">
+        <kbd>/</kbd>
+        <button class="clear" id="clearQ" aria-label="Suche leeren">&times;</button>
+      </div>
+      <label class="ctl">Value Type
+        <select id="vt"><option value="all">Alle</option></select>
+      </label>
+      <label class="ctl">Sortieren
+        <select id="sort">
+          <option value="name">Name</option>
+          <option value="value">Wert (min)</option>
+          <option value="max">Wert (max)</option>
+          <option value="vt">Value Type</option>
+          <option value="map">Map</option>
+          <option value="size">Größe</option>
+          <option value="mass">Masse</option>
+          <option value="dmg">Schaden</option>
+        </select>
+      </label>
+      <button class="btn" id="dir" title="Richtung umkehren" aria-label="Sortierrichtung">↑</button>
+      <label class="ctl">Gruppieren
+        <select id="group">
+          <option value="none">Keine</option>
+          <option value="map">Map</option>
+          <option value="vt">Value Type</option>
+          <option value="size">Größe</option>
+        </select>
+      </label>
+      <button class="btn" id="view" aria-label="Ansicht wechseln">Karten</button>
+    </div>
+    <div class="row"><span class="chip-label">Map</span><div class="chips" id="maps"></div></div>
+    <div class="row"><span class="chip-label">Größe</span><div class="chips" id="sizes"></div></div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="summary" id="summary"></div>
+  <div id="out"></div>
+
+  <section class="legend">
+    <h2>Value Types</h2>
+    <p>Der Value Type legt fest, in welchem Bereich der Preis eines Items gewürfelt wird (auf 100 gerundet). Klick filtert die Liste.</p>
+    <div class="ltable" id="legend"></div>
+  </section>
+</div>
+
+<dialog id="dlg"></dialog>
+
+<script>
+const DATA = /*DATA*/null;
+const ITEMS = DATA.items;
+const TYPES = DATA.types;
+const VT_INDEX = Object.fromEntries(TYPES.map((t, i) => [t.name, i]));
+const SIZES = ['Tiny', 'Small', 'Medium', 'Big', 'Wide', 'Tall', 'Very Tall'];
+const MAPS = [
+  {key: 'Headman Manor', color: 'var(--m-headman)'},
+  {key: 'McJannek Station', color: 'var(--m-mcjannek)'},
+  {key: 'Museum of Human Art', color: 'var(--m-museum)'},
+  {key: 'Swiftbroom Academy', color: 'var(--m-swift)'},
+  {key: 'Any', label: 'Überall', color: 'var(--m-any)'},
+];
+const MAP_BY = Object.fromEntries(MAPS.map(m => [m.key, m]));
+const mapLabel = k => MAP_BY[k]?.label || k;
+const SPECIAL = 'Eigener Bereich';
+
+// Farbe pro Value Type: von grau (billig) über grün/blau/lila zu gold (teuer)
+const VT_COLORS = ['#8b8578','#8b8578','#7c9a6b','#4d9a55','#2f9e7a','#2b8fbf','#3b74d9','#5b5be0','#8a4fe0','#b743c9','#d9822b','#e0a21f','#e8bf1a'];
+const vtColor = vt => vt in VT_INDEX ? VT_COLORS[VT_INDEX[vt]] : '#d14b4b';
+
+// Sonderfälle mit eigener Erklärung (Wiki-Infos)
+const NOTES = {
+  'Small Enemy Valuable': 'Seelen-Orb, droppt beim Töten eines Monsters (Tier 1). Ab Level 20 (Super Moon) explodiert er beim Zerbrechen (~50 Schaden).',
+  'Medium Enemy Valuable': 'Seelen-Orb, droppt beim Töten eines Monsters (Tier 2). Ab Level 20 explodiert er beim Zerbrechen (~100 Schaden).',
+  'Big Enemy Valuable': 'Seelen-Orb, droppt beim Töten eines Monsters (Tier 3). Ab Level 20 explodiert er beim Zerbrechen (~150 Schaden).',
+  'Small Surplus Valuable': 'Geldsack: entsteht, wenn man am Extraction Point über das Ziel abliefert (oder beim Gambit auf Gelb). Größe hängt vom Überschuss ab.',
+  'Medium Surplus Valuable': 'Geldsack: entsteht, wenn man am Extraction Point über das Ziel abliefert (oder beim Gambit auf Gelb). Größe hängt vom Überschuss ab.',
+  'Big Surplus Valuable': 'Geldsack: entsteht, wenn man am Extraction Point über das Ziel abliefert (oder beim Gambit auf Gelb). Größe hängt vom Überschuss ab.',
+  'Cocktail': 'Verliert ca. $500, wenn die Flüssigkeit aus dem Glas schwappt – auch mit Indestructible Drone.',
+  'Egg': 'Masse und Schaden variieren (bis 3 kg / 45 Schaden).',
+};
+
+const fmt = n => '$' + n.toLocaleString('en-US');
+const priceText = it => it.hi == null ? fmt(it.lo) + '+' : fmt(it.lo) + '–' + fmt(it.hi);
+const vtName = it => it.vt || SPECIAL;
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const norm = s => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, ' ').trim();
+ITEMS.forEach((it, i) => { it.id = i; it.key = norm(it.name); });
+
+const store = {
+  get(k, d) { try { const v = localStorage.getItem('repoval.' + k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+  set(k, v) { try { localStorage.setItem('repoval.' + k, JSON.stringify(v)); } catch {} },
+};
+const state = Object.assign({q: '', map: 'all', vt: 'all', size: 'all', sort: 'value', dir: -1, group: 'none', view: 'table'},
+  store.get('state', {}), {q: ''});
+
+const $ = id => document.getElementById(id);
+
+// --- Filter ---
+function matches(it, opts = state) {
+  if (opts.map !== 'all' && it.map !== opts.map) return false;
+  if (opts.size !== 'all' && it.size !== opts.size) return false;
+  if (opts.vt !== 'all' && vtName(it) !== opts.vt) return false;
+  if (state.q) {
+    const words = norm(state.q).split(' ').filter(Boolean);
+    const hay = it.key + ' ' + norm(mapLabel(it.map) + ' ' + it.map);
+    if (!words.every(w => hay.includes(w))) return false;
+  }
+  return true;
+}
+const visible = () => ITEMS.filter(it => matches(it));
+
+// --- Sortierung ---
+const SORTERS = {
+  name: (a, b) => a.name.localeCompare(b.name),
+  value: (a, b) => a.lo - b.lo || (a.hi ?? 1e9) - (b.hi ?? 1e9),
+  max: (a, b) => (a.hi ?? 1e9) - (b.hi ?? 1e9) || a.lo - b.lo,
+  vt: (a, b) => vtSortKey(a) - vtSortKey(b),
+  map: (a, b) => MAPS.findIndex(m => m.key === a.map) - MAPS.findIndex(m => m.key === b.map),
+  size: (a, b) => SIZES.indexOf(a.size) - SIZES.indexOf(b.size),
+  mass: (a, b) => a.mass - b.mass,
+  dmg: (a, b) => a.maxDmg - b.maxDmg,
+};
+// Items ohne festen Typ ordnen sich anhand ihres Mindestwerts zwischen den Typen ein
+function vtSortKey(it) {
+  if (it.vt) return VT_INDEX[it.vt];
+  let k = 0;
+  TYPES.forEach((t, i) => { if (it.lo >= t.lo) k = i + 0.5; });
+  return k;
+}
+function sorted(list) {
+  const f = SORTERS[state.sort];
+  return list.slice().sort((a, b) => state.dir * f(a, b) || SORTERS.value(a, b) || a.name.localeCompare(b.name));
+}
+
+// --- Gruppierung ---
+function groups(list) {
+  if (state.group === 'none') return [{title: null, items: list}];
+  const keyOf = {map: it => it.map, vt: it => vtName(it), size: it => it.size}[state.group];
+  const order = {
+    map: MAPS.map(m => m.key),
+    vt: [...TYPES.map(t => t.name), SPECIAL],
+    size: SIZES,
+  }[state.group];
+  const by = new Map(order.map(k => [k, []]));
+  list.forEach(it => by.get(keyOf(it)).push(it));
+  const out = [...by].filter(([, v]) => v.length).map(([k, v]) => ({key: k, items: v}));
+  // Sortiert man absteigend nach demselben Feld, kommen auch die Gruppen absteigend
+  return state.dir < 0 && state.sort === state.group ? out.reverse() : out;
+}
+function groupTitle(g) {
+  if (state.group === 'map') return `<span class="dot" style="--c:${MAP_BY[g.key].color}"></span>${esc(mapLabel(g.key))}`;
+  if (state.group === 'vt') {
+    const t = TYPES.find(t => t.name === g.key);
+    return `<span class="vt" style="--vc:${vtColor(g.key)}">${esc(g.key)}</span>` + (t ? ` <span class="gmeta">${fmt(t.lo)}–${fmt(t.hi)}</span>` : '');
+  }
+  return esc(g.key);
+}
+function rangeSum(items) {
+  const lo = items.reduce((s, it) => s + it.lo, 0);
+  const open = items.some(it => it.hi == null);
+  const hi = items.reduce((s, it) => s + (it.hi ?? it.lo), 0);
+  return `${items.length} Items · im Schnitt ${fmt(Math.round((lo + hi) / 2 / items.length / 100) * 100)}${open ? ' (mind.)' : ''}`;
+}
+
+// --- Darstellung ---
+function hl(text) {
+  if (!state.q) return esc(text);
+  const words = norm(state.q).split(' ').filter(Boolean);
+  let out = esc(text);
+  words.forEach(w => {
+    const re = new RegExp('(' + w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'ig');
+    out = out.replace(/(^|>)([^<]*)/g, (m, a, b) => a + b.replace(re, '<mark>$1</mark>'));
+  });
+  return out;
+}
+const mapCell = it => `<span class="mapname" title="${esc(mapLabel(it.map))}"><span class="dot" style="--c:${MAP_BY[it.map].color}"></span><span class="mt">${esc(mapLabel(it.map))}</span></span>`;
+const vtBadge = it => `<span class="vt" style="--vc:${vtColor(it.vt)}">${esc(vtName(it))}</span>`;
+const trapTag = it => it.trap ? '<span class="tag trap" title="Trap: macht Lärm">Trap</span>' : '';
+const thumb = it => it.img ? `<img class="thumb" src="${it.img}" alt="" loading="lazy">` : '<div class="thumb"></div>';
+
+const COLS = [
+  {key: null, label: '', cls: 'img'},
+  {key: 'name', label: 'Item'},
+  {key: 'map', label: 'Map'},
+  {key: 'vt', label: 'Value Type', cls: 'hide-xs'},
+  {key: 'value', label: 'Wert', cls: 'num'},
+  {key: 'size', label: 'Größe', cls: 'hide-md'},
+  {key: 'mass', label: 'Masse', cls: 'num hide-md'},
+  {key: 'dmg', label: 'Schaden', cls: 'num hide-md'},
+];
+
+function renderTable(gs) {
+  const arrow = k => state.sort === k || (k === 'value' && state.sort === 'max') ? (state.dir > 0 ? '↑' : '↓') : '';
+  let h = '<table><thead><tr>' + COLS.map(c =>
+    `<th class="${c.cls || ''}" ${c.key ? `data-sort="${c.key}"` : ''}>${c.label}<span class="ar">${c.key ? arrow(c.key) : ''}</span></th>`).join('') + '</tr></thead><tbody>';
+  gs.forEach(g => {
+    if (g.key != null) h += `<tr class="group"><td colspan="${COLS.length}">${groupTitle(g)}<span class="gmeta">${rangeSum(g.items)}</span></td></tr>`;
+    g.items.forEach(it => {
+      h += `<tr data-id="${it.id}">
+        <td class="img">${thumb(it)}</td>
+        <td><span class="name">${hl(it.name)}</span>${trapTag(it)}</td>
+        <td>${mapCell(it)}</td>
+        <td class="hide-xs">${vtBadge(it)}</td>
+        <td class="num">${priceText(it)}</td>
+        <td class="hide-md">${esc(it.size)}</td>
+        <td class="num hide-md">${esc(it.massText.startsWith('Varies') ? '≤ ' + it.mass : it.mass)} kg</td>
+        <td class="num hide-md">${it.maxDmg}</td>
+      </tr>`;
+    });
+  });
+  return h + '</tbody></table>';
+}
+
+function renderCards(gs) {
+  let h = '<div class="grid">';
+  gs.forEach(g => {
+    if (g.key != null) h += `<h3 class="ghead">${groupTitle(g)}<span class="gmeta">${rangeSum(g.items)}</span></h3>`;
+    g.items.forEach(it => {
+      h += `<button class="card" data-id="${it.id}">${thumb(it)}<div class="meta">
+        <div class="name">${hl(it.name)}${trapTag(it)}</div>
+        <div class="price">${priceText(it)}</div>
+        <div>${vtBadge(it)}</div>
+        <div>${mapCell(it)}</div>
+      </div></button>`;
+    });
+  });
+  return h + '</div>';
+}
+
+function renderChips() {
+  const others = k => Object.assign({}, state, {[k]: 'all'});
+  const cnt = (k, v) => ITEMS.filter(it => matches(it, others(k)) && (v === 'all' || (k === 'map' ? it.map : it.size) === v)).length;
+  $('maps').innerHTML = [{key: 'all', label: 'Alle'}, ...MAPS].map(m =>
+    `<button class="chip" data-map="${esc(m.key)}" aria-pressed="${state.map === m.key}">${m.color ? `<span class="dot" style="--c:${m.color}"></span>` : ''}${esc(m.label || m.key)}<span class="n">${cnt('map', m.key)}</span></button>`).join('');
+  $('sizes').innerHTML = ['all', ...SIZES].map(s =>
+    `<button class="chip" data-size="${esc(s)}" aria-pressed="${state.size === s}">${s === 'all' ? 'Alle' : esc(s)}<span class="n">${cnt('size', s)}</span></button>`).join('');
+  const sel = $('vt');
+  const vtCnt = v => ITEMS.filter(it => matches(it, others('vt')) && vtName(it) === v).length;
+  sel.innerHTML = `<option value="all">Alle</option>` + [...TYPES.map(t => t.name), SPECIAL].map(v =>
+    `<option value="${esc(v)}">${esc(v)} (${vtCnt(v)})</option>`).join('');
+  sel.value = state.vt;
+}
+
+function renderLegend() {
+  const vtCnt = v => ITEMS.filter(it => vtName(it) === v).length;
+  $('legend').innerHTML = TYPES.map(t => `<button class="lrow" data-vt="${esc(t.name)}">
+      <span class="vt" style="--vc:${vtColor(t.name)}">${esc(t.name)}</span>
+      <span class="r">${fmt(t.lo)}–${fmt(t.hi)}</span><span class="c">${vtCnt(t.name)} Items</span></button>`).join('') +
+    `<button class="lrow" data-vt="${SPECIAL}"><span class="vt" style="--vc:${vtColor(null)}">${SPECIAL}</span>
+      <span class="r">eigene Spanne</span><span class="c">${vtCnt(SPECIAL)} Items</span></button>`;
+}
+
+function render() {
+  const list = sorted(visible());
+  const gs = groups(list);
+  renderChips();
+  $('q').value !== state.q && ($('q').value = state.q);
+  $('searchBox').classList.toggle('has', !!state.q);
+  $('sort').value = state.sort;
+  $('group').value = state.group;
+  $('dir').textContent = state.dir > 0 ? '↑' : '↓';
+  $('view').textContent = state.view === 'table' ? 'Karten' : 'Tabelle';
+
+  if (!list.length) {
+    $('out').innerHTML = `<div class="empty">Nichts gefunden${state.q ? ` für „${esc(state.q)}“` : ''}. Filter zurücksetzen?</div>`;
+  } else {
+    $('out').innerHTML = state.view === 'table' ? renderTable(gs) : renderCards(gs);
+  }
+  const lo = list.reduce((s, it) => s + it.lo, 0), hi = list.reduce((s, it) => s + (it.hi ?? it.lo), 0);
+  const top = list.slice().sort((a, b) => (b.hi ?? b.lo) - (a.hi ?? a.lo))[0];
+  $('summary').innerHTML = `<span><b>${list.length}</b> von ${ITEMS.length} Valuables</span>` +
+    (list.length ? `<span>Billigstes ab <b>${fmt(Math.min(...list.map(i => i.lo)))}</b></span>
+      <span>Teuerstes: <b>${esc(top.name)}</b> bis ${priceText(top).split('–').pop()}</span>
+      <span>Ø Wert <b>${fmt(Math.round((lo + hi) / 2 / list.length / 100) * 100)}</b></span>` : '');
+  const {q, ...persist} = state;
+  store.set('state', persist);
+}
+
+// --- Detail ---
+function openItem(id) {
+  const it = ITEMS[id];
+  const dmg = it.dmg.split('/');
+  const stunsBig = it.maxDmg >= 30;
+  const same = ITEMS.filter(o => o.map === it.map && o.id !== it.id && vtName(o) === vtName(it)).map(o => o.name);
+  const t = TYPES.find(t => t.name === it.vt);
+  $('dlg').innerHTML = `
+    <div class="dlg-head">${it.img ? `<img src="${it.img}" alt="">` : ''}
+      <div><h3>${esc(it.name)}</h3>${vtBadge(it)} ${trapTag(it)}</div>
+      <button class="x" id="dlgClose" aria-label="Schließen">&times;</button></div>
+    <div class="dlg-body"><dl>
+      <dt>Spawnt in</dt><dd>${mapCell(it)}${it.map === 'Any' ? ' (alle Maps)' : ' (nur hier)'}</dd>
+      <dt>Wert</dt><dd><b>${priceText(it)}</b>${t && (t.lo !== it.lo || t.hi !== it.hi) ? ` <span class="tag">Typ offiziell ${fmt(t.lo)}–${fmt(t.hi)}</span>` : ''}</dd>
+      <dt>Value Type</dt><dd>${esc(vtName(it))}</dd>
+      <dt>Größe</dt><dd>${esc(it.size)}</dd>
+      <dt>Masse</dt><dd>${esc(it.massText)}${/^[\d.]+$/.test(it.massText) ? ' kg' : ''}</dd>
+      <dt>Schaden</dt><dd>${/\d+\/\d+/.test(it.dmg) ? `<div class="dmg">${dmg.map(d => `<span>${esc(d)}</span>`).join('')}</div>` : esc(it.dmg)}</dd>
+      <dt>Große Gegner</dt><dd>${stunsBig ? 'kann sie betäuben (max. Schaden ≥ 30)' : 'betäubt nur kleine Gegner'}</dd>
+    </dl>
+    ${it.trap ? `<div class="note"><b>Trap</b> · Auslöser: ${esc(it.trap.trigger)} · Lärmradius ${esc(it.trap.noise)}<br>${esc(it.trap.desc)}</div>` : ''}
+    ${NOTES[it.name] ? `<div class="note">${esc(NOTES[it.name])}</div>` : ''}
+    ${same.length ? `<div class="note">Gleicher Value Type auf dieser Map: ${same.map(esc).join(', ')}</div>` : ''}
+    </div>
+    <div class="dlg-foot"><a href="${it.url}" target="_blank" rel="noopener">Wiki-Seite öffnen ↗</a><span style="color:var(--muted);font-size:13px">Schaden: leichter / mittlerer / starker / sehr starker Aufprall</span></div>`;
+  $('dlg').showModal();
+  $('dlgClose').onclick = () => $('dlg').close();
+}
+$('dlg').addEventListener('click', e => { if (e.target === $('dlg')) $('dlg').close(); });
+
+// --- Events ---
+$('q').addEventListener('input', e => { state.q = e.target.value; render(); });
+$('q').addEventListener('keydown', e => {
+  if (e.key === 'Escape') { state.q = ''; render(); }
+  // preventDefault, sonst löst dasselbe Enter den Schließen-Knopf im frisch geöffneten Dialog aus
+  if (e.key === 'Enter') { e.preventDefault(); const l = sorted(visible()); if (l.length) openItem(l[0].id); }
+});
+$('clearQ').onclick = () => { state.q = ''; render(); $('q').focus(); };
+document.addEventListener('keydown', e => {
+  if (e.key === '/' && document.activeElement !== $('q') && !$('dlg').open) { e.preventDefault(); $('q').focus(); }
+});
+$('vt').onchange = e => { state.vt = e.target.value; render(); };
+$('sort').onchange = e => { state.sort = e.target.value; state.dir = ['name', 'map', 'size'].includes(state.sort) ? 1 : -1; render(); };
+$('dir').onclick = () => { state.dir *= -1; render(); };
+$('group').onchange = e => { state.group = e.target.value; render(); };
+$('view').onclick = () => { state.view = state.view === 'table' ? 'cards' : 'table'; render(); };
+$('maps').onclick = e => { const b = e.target.closest('[data-map]'); if (b) { state.map = b.dataset.map; render(); } };
+$('sizes').onclick = e => { const b = e.target.closest('[data-size]'); if (b) { state.size = b.dataset.size; render(); } };
+$('legend').onclick = e => {
+  const b = e.target.closest('[data-vt]'); if (!b) return;
+  state.vt = state.vt === b.dataset.vt ? 'all' : b.dataset.vt; render();
+  document.querySelector('.controls').scrollIntoView({behavior: 'smooth'});
+};
+$('out').onclick = e => {
+  const th = e.target.closest('th[data-sort]');
+  if (th) {
+    const k = th.dataset.sort;
+    if (state.sort === k) state.dir *= -1; else { state.sort = k; state.dir = ['name', 'map', 'size'].includes(k) ? 1 : -1; }
+    return render();
+  }
+  if (e.target.closest('.empty')) { Object.assign(state, {q: '', map: 'all', vt: 'all', size: 'all'}); return render(); }
+  const row = e.target.closest('[data-id]');
+  if (row) openItem(+row.dataset.id);
+};
+
+$('total').textContent = ITEMS.length;
+renderLegend();
+render();
+</script>
+</body>
+</html>
