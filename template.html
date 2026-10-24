@@ -204,6 +204,7 @@ dd{margin:0;font-variant-numeric:tabular-nums}
       <button class="tab" role="tab" data-tab="valuables">Valuables</button>
       <button class="tab" role="tab" data-tab="schaden">Schadens-Rechner</button>
       <button class="tab" role="tab" data-tab="level">Level-Geld</button>
+      <button class="tab" role="tab" data-tab="monster">Monster</button>
     </nav>
   </header>
 </div>
@@ -391,6 +392,54 @@ Spieler      = 2,5 × Stufe × Masse   (Item schneller als 3 m/s)</div>
 </div>
 </section>
 
+<!-- ================= Tab 4: Monster ================= -->
+<section class="view" id="view-monster" hidden>
+<div class="wrap">
+  <div class="calc">
+    <div>
+      <div class="panel">
+        <h3>Level</h3>
+        <div class="levels" id="mLevels"></div>
+      </div>
+      <div class="panel">
+        <h3>Einstellung</h3>
+        <div class="checks">
+          <label><input type="checkbox" id="mRuns" checked> Schon 5 oder mehr Runs gespielt</label>
+        </div>
+        <div class="note">Erst ab 5 gespielten Runs können in Level 1–3 die seltenen Gruppen auftauchen (z.B. 10 Gnome oder 4 Apex Predators). Die Zahl zählt das Spiel auf deinem PC mit.</div>
+      </div>
+    </div>
+    <div>
+      <div class="panel">
+        <h3>Wie viele Monster?</h3>
+        <div class="tiles" id="mOut"></div>
+        <div class="note" id="mNote"></div>
+      </div>
+      <div class="panel">
+        <h3>Welche Monster?</h3>
+        <div id="mList"></div>
+      </div>
+      <div class="panel">
+        <h3>So wählt das Spiel aus</h3>
+        <div class="formula">Plätze       = je Stufe aus amountCurve (Stufenfunktion, Level 1–10 und 11–20)
+Ziehen       = für jedes erlaubte Monster der Stufe eine Zufallszahl 0 … Gewicht,
+               das mit der höchsten Zahl gewinnt den Platz
+Gewicht      = 100 (Gruppen 60)
+               − 30 je Strafpunkt aus den letzten Leveln
+               − 10 je Mal, das es in diesem Level schon gezogen wurde   (mindestens 1)
+Strafpunkte  = +2 pro Spawn (höchstens 4), −1 nach jedem Level</div>
+        <div class="note">Quelle: <code>EnemyDirector.AmountSetup</code>, <code>PickEnemies</code>, <code>GetEnemy</code> und <code>RunManager</code> im Spielcode, Monster-Listen und Kurven aus den Spieldaten. Die Chancen sind simuliert: <span id="mRunsN"></span> komplette Runs ab Level 1, genau mit diesen Regeln. Die Strafpunkte hängen vom Verlauf ab, deshalb geht es nur so.</div>
+      </div>
+    </div>
+  </div>
+  <section class="legend">
+    <h2>Alle Level</h2>
+    <p class="lead">Plätze pro Stufe und wie viele Monster dabei im Schnitt herauskommen. Gruppen zählen mit allen Mitgliedern.</p>
+    <div class="scroll" id="mTable"></div>
+  </section>
+</div>
+</section>
+
 <dialog id="dlg"></dialog>
 
 <script>
@@ -497,7 +546,7 @@ const state = Object.assign({q: '', map: 'all', vt: 'all', dur: 'all', size: 'al
 const $ = id => document.getElementById(id);
 
 // ================= Tabs =================
-const TABS = ['valuables', 'schaden', 'level'];
+const TABS = ['valuables', 'schaden', 'level', 'monster'];
 function showTab(name) {
   if (!TABS.includes(name)) name = 'valuables';
   document.querySelectorAll('.tab').forEach(b => b.setAttribute('aria-selected', b.dataset.tab === name));
@@ -898,6 +947,8 @@ function evalCurve(keys, x) {
   let i = 0;
   while (x > keys[i + 1].time) i++;
   const a = keys[i], b = keys[i + 1], dx = b.time - a.time, t = (x - a.time) / dx;
+  // Unendliche Tangente = Stufe: Unity hält den Wert bis zum nächsten Key
+  if (!isFinite(a.outSlope) || !isFinite(b.inSlope)) return a.value;
   const m0 = a.outSlope * dx, m1 = b.inSlope * dx;
   const wo = (a.weightedMode & 2) !== 0, wi = (b.weightedMode & 1) !== 0;
   if (!wo && !wi) {
@@ -1007,6 +1058,118 @@ function levelTable() {
   $('lTable').innerHTML = h + '</tbody></table>';
 }
 
+// ================= Tab 4: Monster =================
+const ENEMY_BY_PREFAB = Object.fromEntries(ENEMIES.map(e => [e.prefab, e]));
+const TIER_NAMES = ['Stufe 1 (leicht)', 'Stufe 2 (mittel)', 'Stufe 3 (schwer)'];
+const SETUPS = [];
+const SPAWN_TIERS = DATA.enemySpawnTiers.map((tier, ti) => tier.map(s => {
+  const counts = new Map();
+  s.spawns.filter(p => !/Director/.test(p)).forEach(p => counts.set(p, (counts.get(p) || 0) + 1));
+  const members = [...counts].map(([prefab, count]) => ({count, enemy: ENEMY_BY_PREFAB[prefab] || {name: prefab.replace('Enemy - ', '')}}));
+  const setup = Object.assign({}, s, {
+    tier: ti + 1, idx: SETUPS.length, members, size: members.reduce((n, m) => n + m.count, 0), group: s.name.startsWith('Enemy Group'),
+  });
+  setup.label = setup.size === 1 ? members[0].enemy.name : members.map(m => `${m.count}× ${m.enemy.name}`).join(' + ');
+  SETUPS.push(setup);
+  return setup;
+}));
+
+// Plätze pro Stufe wie EnemyDirector.AmountSetup: Kurve auswerten, auf Ganzzahl abschneiden
+function enemySlots(n) {
+  const done = n - 1;
+  const d1 = Math.min(Math.max(done / 9, 0), 1), d2 = Math.min(Math.max((done - 9) / 10, 0), 1);
+  const second = d2 > 0, t = second ? d2 : d1;
+  return [1, 2, 3].map(k => Math.trunc(evalCurve(CURVES[`amountCurve${k}_${second ? 2 : 1}`], t)));
+}
+// Darf das Setup in diesem Level gezogen werden? (PickEnemies)
+const setupAllowed = (s, done, runsOk) =>
+  !((s.levelsCompletedCondition && (done < s.levelsCompletedMin || (s.levelsCompletedMax !== 0 && done > s.levelsCompletedMax)))
+    || (!runsOk && s.runsPlayed > 0));
+
+const SIM_RUNS = 4000;
+const simCache = {};
+// Ganze Runs ab Level 1 durchspielen, weil die Strafpunkte vom Verlauf abhängen
+function simulate(runsOk) {
+  if (simCache[runsOk]) return simCache[runsOk];
+  const stats = Array.from({length: 20}, () => ({setup: new Float64Array(SETUPS.length), total: 0, min: Infinity, max: 0}));
+  const hist = new Int32Array(SETUPS.length), inLevel = new Int32Array(SETUPS.length), seen = new Uint8Array(SETUPS.length);
+  for (let r = 0; r < SIM_RUNS; r++) {
+    hist.fill(0);
+    for (let done = 0; done < 20; done++) {
+      const before = Array.from(hist, c => c > 0);  // EnemiesSpawnedRemoveStart
+      const slots = enemySlots(done + 1);
+      const picks = [];
+      inLevel.fill(0);
+      for (const tier of [3, 2, 1]) {
+        for (let k = 0; k < slots[tier - 1]; k++) {
+          let best = null, bestV = -1;
+          for (const s of SPAWN_TIERS[tier - 1]) {
+            if (!setupAllowed(s, done, runsOk)) continue;
+            const v = Math.random() * Math.max(1, s.chance - 30 * hist[s.idx] - 10 * inLevel[s.idx]);
+            if (v > bestV) { best = s; bestV = v; }
+          }
+          picks.push(best);
+          inLevel[best.idx]++;
+        }
+      }
+      // GetEnemy: +2 Strafpunkte pro Spawn, höchstens 4
+      for (const s of picks) { let add = 2; while (hist[s.idx] < 4 && add > 0) { hist[s.idx]++; add--; } }
+      before.forEach((b, i) => { if (b) hist[i]--; });  // EnemiesSpawnedRemoveEnd
+      const st = stats[done];
+      seen.fill(0);
+      let total = 0;
+      for (const s of picks) { total += s.size; if (!seen[s.idx]) { seen[s.idx] = 1; st.setup[s.idx]++; } }
+      st.total += total; st.min = Math.min(st.min, total); st.max = Math.max(st.max, total);
+    }
+  }
+  return simCache[runsOk] = stats;
+}
+
+const mon = {n: +store.get('monN', 1), runsOk: store.get('monRuns', true)};
+$('mLevels').innerHTML = LEVELS.map(l => `<button class="chip" data-n="${l.n}">${l.n === 20 ? '20+' : l.n}</button>`).join('');
+$('mLevels').onclick = e => { const b = e.target.closest('[data-n]'); if (b) { mon.n = +b.dataset.n; store.set('monN', mon.n); monsterRender(); } };
+$('mRuns').checked = mon.runsOk;
+$('mRuns').onchange = e => { mon.runsOk = e.target.checked; store.set('monRuns', mon.runsOk); monsterRender(); monsterTable(); };
+$('mRunsN').textContent = SIM_RUNS.toLocaleString('de-DE');
+
+function monsterRender() {
+  document.querySelectorAll('#mLevels .chip').forEach(b => b.setAttribute('aria-pressed', +b.dataset.n === mon.n));
+  const slots = enemySlots(mon.n), st = simulate(mon.runsOk)[mon.n - 1], done = mon.n - 1;
+  const name = mon.n === 20 ? 'Level 20+' : 'Level ' + mon.n;
+  $('mOut').innerHTML = slots.map((s, i) => `<div class="tile"><div class="k">${TIER_NAMES[i]}</div><div class="v">${s}</div><div class="s">${s === 1 ? 'Platz' : 'Plätze'}</div></div>`).join('') +
+    `<div class="tile hl"><div class="k">Monster in ${name}</div><div class="v">Ø ${num(st.total / SIM_RUNS, 1)}</div>
+      <div class="s">${st.min === st.max ? 'immer ' + st.min : `${st.min} bis ${st.max}, Gruppen zählen voll`}</div></div>`;
+  $('mNote').innerHTML = `${slots.reduce((a, b) => a + b, 0)} Plätze. Jeder Platz bringt ein Monster, eine Gruppe oder einen Schwarm (Gnome, Banger). `
+    + `Mehr werden es im Level nicht. Die Monster sind aber nicht ständig alle da: Jedes taucht auf, verschwindet nach einer Weile wieder (auch wenn es getötet wurde) und kommt später zurück.`;
+  $('mList').innerHTML = SPAWN_TIERS.map((tier, i) => {
+    if (!slots[i]) return `<h4 style="margin:12px 0 6px">${TIER_NAMES[i]}</h4><div class="note">In ${name} gibt es keinen Platz dieser Stufe.</div>`;
+    const rows = tier.map(s => ({s, p: st.setup[s.idx] / SIM_RUNS, ok: setupAllowed(s, done, mon.runsOk)}))
+      .filter(r => r.ok).sort((a, b) => b.p - a.p || a.s.label.localeCompare(b.s.label));
+    const hidden = tier.length - rows.length;
+    return `<h4 style="margin:14px 0 6px">${TIER_NAMES[i]} · ${slots[i]} ${slots[i] === 1 ? 'Platz' : 'Plätze'}</h4>
+      <table><thead><tr><th>Monster</th><th class="num">HP</th><th class="hide-xs">Gewicht</th><th class="num">Chance in ${name}</th></tr></thead><tbody>
+      ${rows.map(({s, p}) => {
+        const e = s.members[0].enemy;
+        return `<tr><td><span class="name">${esc(s.label)}</span>${s.group ? '<span class="tag trap">seltene Gruppe</span>' : ''}</td>
+          <td class="num">${s.members.map(m => m.enemy.health ?? '?').join(' / ')}</td>
+          <td class="hide-xs">${e.weight ? WEIGHT_DE[e.weight] : '–'}</td>
+          <td class="num">${pct(p)}</td></tr>`;
+      }).join('')}</tbody></table>
+      ${hidden ? `<div class="hint" style="color:var(--muted);font-size:12.5px;margin-top:4px">${hidden} weitere ${hidden === 1 ? 'Eintrag ist' : 'Einträge sind'} in diesem Level nicht möglich${tier.some(s => s.group) ? ' (Gruppen nur Level 1–3' + (mon.runsOk ? '' : ' und ab 5 Runs') + ')' : ''}${tier.some(s => s.levelsCompletedMin > 0) ? ', Loom erst ab Level 3' : ''}.</div>` : ''}`;
+  }).join('');
+}
+
+function monsterTable() {
+  const stats = simulate(mon.runsOk);
+  let h = `<table><thead><tr><th>Level</th>${TIER_NAMES.map(t => `<th class="num">${t}</th>`).join('')}<th class="num">Plätze</th><th class="num">Ø Monster</th><th class="num">min–max</th></tr></thead><tbody>`;
+  LEVELS.forEach(l => {
+    const s = enemySlots(l.n), st = stats[l.n - 1];
+    h += `<tr><td>${l.n === 20 ? '20+' : l.n}</td>${s.map(x => `<td class="num">${x}</td>`).join('')}<td class="num">${s[0] + s[1] + s[2]}</td>
+      <td class="num">${num(st.total / SIM_RUNS, 1)}</td><td class="num">${st.min === st.max ? st.min : st.min + '–' + st.max}</td></tr>`;
+  });
+  $('mTable').innerHTML = h + '</tbody></table>';
+}
+
 // ================= Start =================
 $('total').textContent = ITEMS.length;
 renderLegend();
@@ -1017,6 +1180,8 @@ dmgRender();
 levelRender();
 levelTable();
 showTab(location.hash.slice(1));
+// Die Simulation braucht einen Moment; erst nach dem ersten Zeichnen rechnen
+setTimeout(() => { monsterRender(); monsterTable(); }, 0);
 </script>
 </body>
 </html>

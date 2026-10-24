@@ -1958,266 +1958,967 @@
  },
  "enemies": [
   {
-   "weight": "Medium",
    "name": "Animal",
    "difficulty": 2,
+   "weight": "Medium",
    "health": 150,
    "objectHurt": true,
    "objectHurtMultiplier": 1.0,
-   "objectHurtStun": true
+   "objectHurtStun": true,
+   "prefab": "Enemy - Animal"
   },
   {
-   "weight": "Light",
    "name": "Apex Predator",
    "difficulty": 1,
+   "weight": "Light",
    "health": 150,
    "objectHurt": true,
    "objectHurtMultiplier": 1.0,
-   "objectHurtStun": false
+   "objectHurtStun": false,
+   "prefab": "Enemy - Duck"
   },
   {
-   "weight": "VeryLight",
    "name": "Banger",
    "difficulty": 2,
+   "weight": "VeryLight",
    "health": 50,
    "objectHurt": true,
    "objectHurtMultiplier": 1.0,
-   "objectHurtStun": true
+   "objectHurtStun": true,
+   "prefab": "Enemy - Bang"
   },
   {
-   "weight": "Medium",
    "name": "Bella",
    "difficulty": 1,
+   "weight": "Medium",
    "health": 200,
    "objectHurt": true,
    "objectHurtMultiplier": 1.0,
-   "objectHurtStun": true
+   "objectHurtStun": true,
+   "prefab": "Enemy - Tricycle"
   },
   {
-   "weight": "Light",
    "name": "Birthday Boy",
    "difficulty": 1,
+   "weight": "Light",
    "health": 150,
    "objectHurt": true,
    "objectHurtMultiplier": 1.0,
-   "objectHurtStun": true
+   "objectHurtStun": true,
+   "prefab": "Enemy - Birthday boy"
   },
   {
-   "weight": "Heavy",
    "name": "Bowtie",
    "difficulty": 2,
+   "weight": "Heavy",
    "health": 200,
    "objectHurt": true,
    "objectHurtMultiplier": 1.0,
-   "objectHurtStun": true
+   "objectHurtStun": true,
+   "prefab": "Enemy - Bowtie"
   },
   {
-   "weight": "Medium",
    "name": "Chef",
    "difficulty": 2,
+   "weight": "Medium",
    "health": 150,
    "objectHurt": true,
    "objectHurtMultiplier": 1.0,
-   "objectHurtStun": true
+   "objectHurtStun": true,
+   "prefab": "Enemy - Tumbler"
   },
   {
-   "weight": "Heavy",
    "name": "Cleanup Crew",
    "difficulty": 3,
+   "weight": "Heavy",
    "health": 350,
    "objectHurt": true,
    "objectHurtMultiplier": 1.0,
-   "objectHurtStun": true
+   "objectHurtStun": true,
+   "prefab": "Enemy - Bomb Thrower"
   },
   {
-   "weight": "VeryHeavy",
    "name": "Clown",
    "difficulty": 3,
+   "weight": "VeryHeavy",
    "health": 250,
    "objectHurt": true,
    "objectHurtMultiplier": 1.0,
-   "objectHurtStun": true
+   "objectHurtStun": true,
+   "prefab": "Enemy - Beamer"
   },
   {
-   "weight": "Light",
    "name": "Elsa",
    "difficulty": 1,
+   "weight": "Light",
    "health": 600,
    "objectHurt": true,
    "objectHurtMultiplier": 1.0,
-   "objectHurtStun": false
+   "objectHurtStun": false,
+   "prefab": "Enemy - Elsa"
   },
   {
-   "weight": "Heavy",
    "name": "Gambit",
    "difficulty": 2,
+   "weight": "Heavy",
    "health": 150,
    "objectHurt": true,
    "objectHurtMultiplier": 1.0,
-   "objectHurtStun": true
+   "objectHurtStun": true,
+   "prefab": "Enemy - Spinny"
   },
   {
-   "weight": "VeryLight",
    "name": "Gnome",
    "difficulty": 1,
+   "weight": "VeryLight",
    "health": 20,
    "objectHurt": true,
    "objectHurtMultiplier": 10.0,
-   "objectHurtStun": true
+   "objectHurtStun": true,
+   "prefab": "Enemy - Gnome"
   },
   {
-   "weight": "Light",
    "name": "Headgrab",
    "difficulty": 2,
+   "weight": "Light",
    "health": 150,
    "objectHurt": true,
    "objectHurtMultiplier": 1.0,
-   "objectHurtStun": true
+   "objectHurtStun": true,
+   "prefab": "Enemy - Head Grabber"
   },
   {
-   "weight": "Heavy",
    "name": "Headman",
    "difficulty": 3,
+   "weight": "Heavy",
    "health": 250,
    "objectHurt": true,
    "objectHurtMultiplier": 0.5,
-   "objectHurtStun": true
+   "objectHurtStun": true,
+   "prefab": "Enemy - Head"
   },
   {
-   "weight": "Heavy",
    "name": "Heart Hugger",
    "difficulty": 2,
+   "weight": "Heavy",
    "health": 300,
    "objectHurt": true,
    "objectHurtMultiplier": 1.0,
-   "objectHurtStun": true
+   "objectHurtStun": true,
+   "prefab": "Enemy - Heart Hugger"
   },
   {
-   "weight": "Medium",
    "name": "Hidden",
    "difficulty": 2,
+   "weight": "Medium",
    "health": 100,
    "objectHurt": true,
    "objectHurtMultiplier": 1.0,
-   "objectHurtStun": true
+   "objectHurtStun": true,
+   "prefab": "Enemy - Hidden"
   },
   {
-   "weight": "Heavy",
    "name": "Huntsman",
    "difficulty": 3,
+   "weight": "Heavy",
    "health": 250,
    "objectHurt": true,
    "objectHurtMultiplier": 1.0,
-   "objectHurtStun": true
+   "objectHurtStun": true,
+   "prefab": "Enemy - Hunter"
   },
   {
-   "weight": "Heavy",
    "name": "Loom",
    "difficulty": 3,
+   "weight": "Heavy",
    "health": 500,
    "objectHurt": true,
    "objectHurtMultiplier": 1.0,
-   "objectHurtStun": true
+   "objectHurtStun": true,
+   "prefab": "Enemy - Shadow"
   },
   {
-   "weight": "Heavy",
    "name": "Mentalist",
    "difficulty": 2,
+   "weight": "Heavy",
    "health": 150,
    "objectHurt": true,
    "objectHurtMultiplier": 1.0,
-   "objectHurtStun": true
+   "objectHurtStun": true,
+   "prefab": "Enemy - Floater"
   },
   {
-   "weight": "Heavy",
    "name": "Oogly",
    "difficulty": 2,
+   "weight": "Heavy",
    "health": 200,
    "objectHurt": true,
    "objectHurtMultiplier": 1.0,
-   "objectHurtStun": true
+   "objectHurtStun": true,
+   "prefab": "Enemy - Oogly"
   },
   {
-   "weight": "Medium",
    "name": "Peeper",
    "difficulty": 1,
+   "weight": "Medium",
    "health": 30,
    "objectHurt": false,
    "objectHurtMultiplier": 1.0,
-   "objectHurtStun": true
+   "objectHurtStun": true,
+   "prefab": "Enemy - Ceiling Eye"
   },
   {
-   "weight": "Heavy",
    "name": "Reaper",
    "difficulty": 3,
+   "weight": "Heavy",
    "health": 250,
    "objectHurt": true,
    "objectHurtMultiplier": 1.0,
-   "objectHurtStun": true
+   "objectHurtStun": true,
+   "prefab": "Enemy - Runner"
   },
   {
-   "weight": "Heavy",
    "name": "Robe",
    "difficulty": 3,
+   "weight": "Heavy",
    "health": 250,
    "objectHurt": true,
    "objectHurtMultiplier": 1.0,
-   "objectHurtStun": true
+   "objectHurtStun": true,
+   "prefab": "Enemy - Robe"
   },
   {
-   "weight": "Light",
    "name": "Rugrat",
    "difficulty": 2,
+   "weight": "Light",
    "health": 150,
    "objectHurt": true,
    "objectHurtMultiplier": 1.0,
-   "objectHurtStun": true
+   "objectHurtStun": true,
+   "prefab": "Enemy - Valuable Thrower"
   },
   {
-   "weight": "Medium",
    "name": "Shadow Child",
    "difficulty": 1,
+   "weight": "Medium",
    "health": 150,
    "objectHurt": true,
    "objectHurtMultiplier": 1.0,
-   "objectHurtStun": true
+   "objectHurtStun": true,
+   "prefab": "Enemy - Thin Man"
   },
   {
-   "weight": "Medium",
    "name": "Spewer",
    "difficulty": 1,
+   "weight": "Medium",
    "health": 65,
    "objectHurt": true,
    "objectHurtMultiplier": 1.0,
-   "objectHurtStun": true
+   "objectHurtStun": true,
+   "prefab": "Enemy - Slow Mouth"
   },
   {
-   "weight": "Light",
    "name": "Tick",
    "difficulty": 1,
+   "weight": "Light",
    "health": 10,
    "objectHurt": false,
    "objectHurtMultiplier": 1.0,
-   "objectHurtStun": false
+   "objectHurtStun": false,
+   "prefab": "Enemy - Tick"
   },
   {
-   "weight": "VeryHeavy",
    "name": "Trudge",
    "difficulty": 3,
+   "weight": "VeryHeavy",
    "health": 500,
    "objectHurt": true,
    "objectHurtMultiplier": 1.0,
-   "objectHurtStun": true
+   "objectHurtStun": true,
+   "prefab": "Enemy - Slow Walker"
   },
   {
-   "weight": "Light",
    "name": "Upscream",
    "difficulty": 2,
+   "weight": "Light",
    "health": 50,
    "objectHurt": true,
    "objectHurtMultiplier": 1.0,
-   "objectHurtStun": true
+   "objectHurtStun": true,
+   "prefab": "Enemy - Upscream"
   }
+ ],
+ "enemySpawnTiers": [
+  [
+   {
+    "name": "Ceiling Eye",
+    "spawns": [
+     "Enemy - Ceiling Eye"
+    ],
+    "levelsCompletedCondition": false,
+    "levelsCompletedMin": 0,
+    "levelsCompletedMax": 10,
+    "chance": 100.0,
+    "rarity": "Very Common",
+    "runsPlayed": 0
+   },
+   {
+    "name": "Thin Man",
+    "spawns": [
+     "Enemy - Thin Man"
+    ],
+    "levelsCompletedCondition": false,
+    "levelsCompletedMin": 0,
+    "levelsCompletedMax": 10,
+    "chance": 100.0,
+    "rarity": "Very Common",
+    "runsPlayed": 0
+   },
+   {
+    "name": "Gnome",
+    "spawns": [
+     "Enemy - Gnome Director",
+     "Enemy - Gnome",
+     "Enemy - Gnome",
+     "Enemy - Gnome",
+     "Enemy - Gnome"
+    ],
+    "levelsCompletedCondition": false,
+    "levelsCompletedMin": 0,
+    "levelsCompletedMax": 10,
+    "chance": 100.0,
+    "rarity": "Very Common",
+    "runsPlayed": 0
+   },
+   {
+    "name": "Duck",
+    "spawns": [
+     "Enemy - Duck"
+    ],
+    "levelsCompletedCondition": false,
+    "levelsCompletedMin": 0,
+    "levelsCompletedMax": 10,
+    "chance": 100.0,
+    "rarity": "Very Common",
+    "runsPlayed": 0
+   },
+   {
+    "name": "Slow Mouth",
+    "spawns": [
+     "Enemy - Slow Mouth"
+    ],
+    "levelsCompletedCondition": false,
+    "levelsCompletedMin": 0,
+    "levelsCompletedMax": 10,
+    "chance": 100.0,
+    "rarity": "Very Common",
+    "runsPlayed": 0
+   },
+   {
+    "name": "Tick",
+    "spawns": [
+     "Enemy - Tick"
+    ],
+    "levelsCompletedCondition": false,
+    "levelsCompletedMin": 0,
+    "levelsCompletedMax": 10,
+    "chance": 100.0,
+    "rarity": "Very Common",
+    "runsPlayed": 0
+   },
+   {
+    "name": "Birthday Boy",
+    "spawns": [
+     "Enemy - Birthday boy"
+    ],
+    "levelsCompletedCondition": false,
+    "levelsCompletedMin": 0,
+    "levelsCompletedMax": 10,
+    "chance": 100.0,
+    "rarity": "Very Common",
+    "runsPlayed": 0
+   },
+   {
+    "name": "Elsa",
+    "spawns": [
+     "Enemy - Elsa"
+    ],
+    "levelsCompletedCondition": false,
+    "levelsCompletedMin": 0,
+    "levelsCompletedMax": 10,
+    "chance": 100.0,
+    "rarity": "Very Common",
+    "runsPlayed": 0
+   },
+   {
+    "name": "Tricycle",
+    "spawns": [
+     "Enemy - Tricycle"
+    ],
+    "levelsCompletedCondition": false,
+    "levelsCompletedMin": 0,
+    "levelsCompletedMax": 10,
+    "chance": 100.0,
+    "rarity": "Very Common",
+    "runsPlayed": 0
+   }
+  ],
+  [
+   {
+    "name": "Valuable Thrower",
+    "spawns": [
+     "Enemy - Valuable Thrower"
+    ],
+    "levelsCompletedCondition": false,
+    "levelsCompletedMin": 0,
+    "levelsCompletedMax": 10,
+    "chance": 100.0,
+    "rarity": "Very Common",
+    "runsPlayed": 0
+   },
+   {
+    "name": "Animal",
+    "spawns": [
+     "Enemy - Animal"
+    ],
+    "levelsCompletedCondition": false,
+    "levelsCompletedMin": 0,
+    "levelsCompletedMax": 10,
+    "chance": 100.0,
+    "rarity": "Very Common",
+    "runsPlayed": 0
+   },
+   {
+    "name": "Upscream",
+    "spawns": [
+     "Enemy - Upscream"
+    ],
+    "levelsCompletedCondition": false,
+    "levelsCompletedMin": 0,
+    "levelsCompletedMax": 10,
+    "chance": 100.0,
+    "rarity": "Very Common",
+    "runsPlayed": 0
+   },
+   {
+    "name": "Hidden",
+    "spawns": [
+     "Enemy - Hidden"
+    ],
+    "levelsCompletedCondition": false,
+    "levelsCompletedMin": 0,
+    "levelsCompletedMax": 10,
+    "chance": 100.0,
+    "rarity": "Very Common",
+    "runsPlayed": 0
+   },
+   {
+    "name": "Tumbler",
+    "spawns": [
+     "Enemy - Tumbler"
+    ],
+    "levelsCompletedCondition": false,
+    "levelsCompletedMin": 0,
+    "levelsCompletedMax": 10,
+    "chance": 100.0,
+    "rarity": "Very Common",
+    "runsPlayed": 0
+   },
+   {
+    "name": "Bowtie",
+    "spawns": [
+     "Enemy - Bowtie"
+    ],
+    "levelsCompletedCondition": false,
+    "levelsCompletedMin": 0,
+    "levelsCompletedMax": 10,
+    "chance": 100.0,
+    "rarity": "Very Common",
+    "runsPlayed": 0
+   },
+   {
+    "name": "Floater",
+    "spawns": [
+     "Enemy - Floater"
+    ],
+    "levelsCompletedCondition": false,
+    "levelsCompletedMin": 0,
+    "levelsCompletedMax": 10,
+    "chance": 100.0,
+    "rarity": "Very Common",
+    "runsPlayed": 0
+   },
+   {
+    "name": "Bang",
+    "spawns": [
+     "Enemy - Bang Director",
+     "Enemy - Bang",
+     "Enemy - Bang",
+     "Enemy - Bang"
+    ],
+    "levelsCompletedCondition": false,
+    "levelsCompletedMin": 0,
+    "levelsCompletedMax": 10,
+    "chance": 100.0,
+    "rarity": "Very Common",
+    "runsPlayed": 0
+   },
+   {
+    "name": "Spinny",
+    "spawns": [
+     "Enemy - Spinny"
+    ],
+    "levelsCompletedCondition": false,
+    "levelsCompletedMin": 0,
+    "levelsCompletedMax": 10,
+    "chance": 100.0,
+    "rarity": "Very Common",
+    "runsPlayed": 0
+   },
+   {
+    "name": "Heart Hugger",
+    "spawns": [
+     "Enemy - Heart Hugger"
+    ],
+    "levelsCompletedCondition": false,
+    "levelsCompletedMin": 0,
+    "levelsCompletedMax": 10,
+    "chance": 100.0,
+    "rarity": "Very Common",
+    "runsPlayed": 0
+   },
+   {
+    "name": "Head Grabber",
+    "spawns": [
+     "Enemy - Head Grabber"
+    ],
+    "levelsCompletedCondition": false,
+    "levelsCompletedMin": 0,
+    "levelsCompletedMax": 10,
+    "chance": 100.0,
+    "rarity": "Very Common",
+    "runsPlayed": 0
+   },
+   {
+    "name": "Oogly",
+    "spawns": [
+     "Enemy - Oogly"
+    ],
+    "levelsCompletedCondition": false,
+    "levelsCompletedMin": 0,
+    "levelsCompletedMax": 10,
+    "chance": 100.0,
+    "rarity": "Very Common",
+    "runsPlayed": 0
+   }
+  ],
+  [
+   {
+    "name": "Head",
+    "spawns": [
+     "Enemy - Head"
+    ],
+    "levelsCompletedCondition": false,
+    "levelsCompletedMin": 0,
+    "levelsCompletedMax": 10,
+    "chance": 100.0,
+    "rarity": "Very Common",
+    "runsPlayed": 0
+   },
+   {
+    "name": "Robe",
+    "spawns": [
+     "Enemy - Robe"
+    ],
+    "levelsCompletedCondition": false,
+    "levelsCompletedMin": 0,
+    "levelsCompletedMax": 10,
+    "chance": 100.0,
+    "rarity": "Very Common",
+    "runsPlayed": 0
+   },
+   {
+    "name": "Hunter",
+    "spawns": [
+     "Enemy - Hunter"
+    ],
+    "levelsCompletedCondition": false,
+    "levelsCompletedMin": 0,
+    "levelsCompletedMax": 10,
+    "chance": 100.0,
+    "rarity": "Very Common",
+    "runsPlayed": 0
+   },
+   {
+    "name": "Runner",
+    "spawns": [
+     "Enemy - Runner"
+    ],
+    "levelsCompletedCondition": false,
+    "levelsCompletedMin": 0,
+    "levelsCompletedMax": 10,
+    "chance": 100.0,
+    "rarity": "Very Common",
+    "runsPlayed": 0
+   },
+   {
+    "name": "Beamer",
+    "spawns": [
+     "Enemy - Beamer"
+    ],
+    "levelsCompletedCondition": false,
+    "levelsCompletedMin": 0,
+    "levelsCompletedMax": 10,
+    "chance": 100.0,
+    "rarity": "Very Common",
+    "runsPlayed": 0
+   },
+   {
+    "name": "Slow Walker",
+    "spawns": [
+     "Enemy - Slow Walker"
+    ],
+    "levelsCompletedCondition": false,
+    "levelsCompletedMin": 0,
+    "levelsCompletedMax": 10,
+    "chance": 100.0,
+    "rarity": "Very Common",
+    "runsPlayed": 0
+   },
+   {
+    "name": "Shadow",
+    "spawns": [
+     "Enemy - Shadow"
+    ],
+    "levelsCompletedCondition": true,
+    "levelsCompletedMin": 2,
+    "levelsCompletedMax": 0,
+    "chance": 100.0,
+    "rarity": "Very Common",
+    "runsPlayed": 0
+   },
+   {
+    "name": "Bomb Thrower",
+    "spawns": [
+     "Enemy - Bomb Thrower"
+    ],
+    "levelsCompletedCondition": false,
+    "levelsCompletedMin": 0,
+    "levelsCompletedMax": 10,
+    "chance": 100.0,
+    "rarity": "Very Common",
+    "runsPlayed": 0
+   },
+   {
+    "name": "Enemy Group - 3 Animals",
+    "spawns": [
+     "Enemy - Animal",
+     "Enemy - Animal",
+     "Enemy - Animal"
+    ],
+    "levelsCompletedCondition": true,
+    "levelsCompletedMin": 0,
+    "levelsCompletedMax": 2,
+    "chance": 60.0,
+    "rarity": "Very Rare",
+    "runsPlayed": 5
+   },
+   {
+    "name": "Enemy Group - 3 Bowties",
+    "spawns": [
+     "Enemy - Bowtie",
+     "Enemy - Bowtie",
+     "Enemy - Bowtie"
+    ],
+    "levelsCompletedCondition": true,
+    "levelsCompletedMin": 0,
+    "levelsCompletedMax": 2,
+    "chance": 60.0,
+    "rarity": "Very Rare",
+    "runsPlayed": 5
+   },
+   {
+    "name": "Enemy Group - 3 Floaters",
+    "spawns": [
+     "Enemy - Floater",
+     "Enemy - Floater",
+     "Enemy - Floater"
+    ],
+    "levelsCompletedCondition": true,
+    "levelsCompletedMin": 0,
+    "levelsCompletedMax": 2,
+    "chance": 60.0,
+    "rarity": "Very Rare",
+    "runsPlayed": 5
+   },
+   {
+    "name": "Enemy Group - 2 Hidden",
+    "spawns": [
+     "Enemy - Hidden",
+     "Enemy - Hidden"
+    ],
+    "levelsCompletedCondition": true,
+    "levelsCompletedMin": 0,
+    "levelsCompletedMax": 2,
+    "chance": 60.0,
+    "rarity": "Very Rare",
+    "runsPlayed": 5
+   },
+   {
+    "name": "Enemy Group - 3 Tumblers",
+    "spawns": [
+     "Enemy - Tumbler",
+     "Enemy - Tumbler",
+     "Enemy - Tumbler"
+    ],
+    "levelsCompletedCondition": true,
+    "levelsCompletedMin": 0,
+    "levelsCompletedMax": 2,
+    "chance": 60.0,
+    "rarity": "Very Rare",
+    "runsPlayed": 5
+   },
+   {
+    "name": "Enemy Group - 3 Upscreams",
+    "spawns": [
+     "Enemy - Upscream",
+     "Enemy - Upscream",
+     "Enemy - Upscream"
+    ],
+    "levelsCompletedCondition": true,
+    "levelsCompletedMin": 0,
+    "levelsCompletedMax": 2,
+    "chance": 60.0,
+    "rarity": "Very Rare",
+    "runsPlayed": 5
+   },
+   {
+    "name": "Enemy Group - 3 Valuable Throwers",
+    "spawns": [
+     "Enemy - Valuable Thrower",
+     "Enemy - Valuable Thrower",
+     "Enemy - Valuable Thrower"
+    ],
+    "levelsCompletedCondition": true,
+    "levelsCompletedMin": 0,
+    "levelsCompletedMax": 2,
+    "chance": 60.0,
+    "rarity": "Very Rare",
+    "runsPlayed": 5
+   },
+   {
+    "name": "Enemy Group - 4 Ceiling Eyes",
+    "spawns": [
+     "Enemy - Ceiling Eye",
+     "Enemy - Ceiling Eye",
+     "Enemy - Ceiling Eye",
+     "Enemy - Ceiling Eye"
+    ],
+    "levelsCompletedCondition": true,
+    "levelsCompletedMin": 0,
+    "levelsCompletedMax": 2,
+    "chance": 60.0,
+    "rarity": "Very Rare",
+    "runsPlayed": 5
+   },
+   {
+    "name": "Enemy Group - 4 Ducks",
+    "spawns": [
+     "Enemy - Duck",
+     "Enemy - Duck",
+     "Enemy - Duck",
+     "Enemy - Duck"
+    ],
+    "levelsCompletedCondition": true,
+    "levelsCompletedMin": 0,
+    "levelsCompletedMax": 2,
+    "chance": 60.0,
+    "rarity": "Very Rare",
+    "runsPlayed": 5
+   },
+   {
+    "name": "Enemy Group - 4 Slow Mouths",
+    "spawns": [
+     "Enemy - Slow Mouth",
+     "Enemy - Slow Mouth",
+     "Enemy - Slow Mouth",
+     "Enemy - Slow Mouth"
+    ],
+    "levelsCompletedCondition": true,
+    "levelsCompletedMin": 0,
+    "levelsCompletedMax": 2,
+    "chance": 60.0,
+    "rarity": "Very Rare",
+    "runsPlayed": 5
+   },
+   {
+    "name": "Enemy Group - 4 Thin Men",
+    "spawns": [
+     "Enemy - Thin Man",
+     "Enemy - Thin Man",
+     "Enemy - Thin Man",
+     "Enemy - Thin Man"
+    ],
+    "levelsCompletedCondition": true,
+    "levelsCompletedMin": 0,
+    "levelsCompletedMax": 2,
+    "chance": 60.0,
+    "rarity": "Very Rare",
+    "runsPlayed": 5
+   },
+   {
+    "name": "Enemy Group - 6 Bangs",
+    "spawns": [
+     "Enemy - Bang Director",
+     "Enemy - Bang",
+     "Enemy - Bang",
+     "Enemy - Bang",
+     "Enemy - Bang",
+     "Enemy - Bang",
+     "Enemy - Bang"
+    ],
+    "levelsCompletedCondition": true,
+    "levelsCompletedMin": 0,
+    "levelsCompletedMax": 2,
+    "chance": 60.0,
+    "rarity": "Very Rare",
+    "runsPlayed": 5
+   },
+   {
+    "name": "Enemy Group - 10 Gnomes",
+    "spawns": [
+     "Enemy - Gnome Director",
+     "Enemy - Gnome",
+     "Enemy - Gnome",
+     "Enemy - Gnome",
+     "Enemy - Gnome",
+     "Enemy - Gnome",
+     "Enemy - Gnome",
+     "Enemy - Gnome",
+     "Enemy - Gnome",
+     "Enemy - Gnome",
+     "Enemy - Gnome"
+    ],
+    "levelsCompletedCondition": true,
+    "levelsCompletedMin": 0,
+    "levelsCompletedMax": 2,
+    "chance": 60.0,
+    "rarity": "Very Rare",
+    "runsPlayed": 5
+   },
+   {
+    "name": "Enemy Group - 2 Spinny",
+    "spawns": [
+     "Enemy - Spinny",
+     "Enemy - Spinny"
+    ],
+    "levelsCompletedCondition": true,
+    "levelsCompletedMin": 0,
+    "levelsCompletedMax": 2,
+    "chance": 60.0,
+    "rarity": "Very Rare",
+    "runsPlayed": 5
+   },
+   {
+    "name": "Enemy Group - 2 Heart Huggers",
+    "spawns": [
+     "Enemy - Heart Hugger",
+     "Enemy - Heart Hugger"
+    ],
+    "levelsCompletedCondition": true,
+    "levelsCompletedMin": 0,
+    "levelsCompletedMax": 2,
+    "chance": 60.0,
+    "rarity": "Very Rare",
+    "runsPlayed": 5
+   },
+   {
+    "name": "Enemy Group - 5 Ticks",
+    "spawns": [
+     "Enemy - Tick",
+     "Enemy - Tick",
+     "Enemy - Tick",
+     "Enemy - Tick",
+     "Enemy - Tick"
+    ],
+    "levelsCompletedCondition": true,
+    "levelsCompletedMin": 0,
+    "levelsCompletedMax": 2,
+    "chance": 60.0,
+    "rarity": "Very Rare",
+    "runsPlayed": 5
+   },
+   {
+    "name": "Enemy Group - 3 Birthday Boys",
+    "spawns": [
+     "Enemy - Birthday boy",
+     "Enemy - Birthday boy",
+     "Enemy - Birthday boy"
+    ],
+    "levelsCompletedCondition": true,
+    "levelsCompletedMin": 0,
+    "levelsCompletedMax": 2,
+    "chance": 60.0,
+    "rarity": "Very Rare",
+    "runsPlayed": 5
+   },
+   {
+    "name": "Enemy Group - 3 Elsas",
+    "spawns": [
+     "Enemy - Elsa",
+     "Enemy - Elsa",
+     "Enemy - Elsa"
+    ],
+    "levelsCompletedCondition": true,
+    "levelsCompletedMin": 0,
+    "levelsCompletedMax": 2,
+    "chance": 60.0,
+    "rarity": "Very Rare",
+    "runsPlayed": 5
+   },
+   {
+    "name": "Enemy Group - 3 Head Grabbers",
+    "spawns": [
+     "Enemy - Head Grabber",
+     "Enemy - Head Grabber",
+     "Enemy - Head Grabber"
+    ],
+    "levelsCompletedCondition": true,
+    "levelsCompletedMin": 0,
+    "levelsCompletedMax": 2,
+    "chance": 60.0,
+    "rarity": "Very Rare",
+    "runsPlayed": 5
+   },
+   {
+    "name": "Enemy Group - 3 Ooglies",
+    "spawns": [
+     "Enemy - Oogly",
+     "Enemy - Oogly",
+     "Enemy - Oogly"
+    ],
+    "levelsCompletedCondition": true,
+    "levelsCompletedMin": 0,
+    "levelsCompletedMax": 2,
+    "chance": 60.0,
+    "rarity": "Very Rare",
+    "runsPlayed": 5
+   },
+   {
+    "name": "Enemy Group - 3 Tricycles",
+    "spawns": [
+     "Enemy - Tricycle",
+     "Enemy - Tricycle",
+     "Enemy - Tricycle"
+    ],
+    "levelsCompletedCondition": true,
+    "levelsCompletedMin": 0,
+    "levelsCompletedMax": 2,
+    "chance": 60.0,
+    "rarity": "Very Rare",
+    "runsPlayed": 5
+   }
+  ]
  ],
  "curves": {
   "haulGoalCurve1": [
@@ -2622,6 +3323,171 @@
     "outWeight": 0.0
    }
   ],
-  "veryTallChance": 50
+  "veryTallChance": 50,
+  "amountCurve1_1": [
+   {
+    "time": 0.0,
+    "value": 1.0,
+    "inSlope": Infinity,
+    "outSlope": Infinity,
+    "weightedMode": 3,
+    "inWeight": 0.0,
+    "outWeight": 0.0
+   },
+   {
+    "time": 0.5,
+    "value": 2.0,
+    "inSlope": Infinity,
+    "outSlope": Infinity,
+    "weightedMode": 3,
+    "inWeight": 0.0,
+    "outWeight": 0.0
+   },
+   {
+    "time": 1.0,
+    "value": 2.0,
+    "inSlope": Infinity,
+    "outSlope": Infinity,
+    "weightedMode": 1,
+    "inWeight": 0.0,
+    "outWeight": 0.0
+   }
+  ],
+  "amountCurve1_2": [
+   {
+    "time": 0.0,
+    "value": 2.0,
+    "inSlope": Infinity,
+    "outSlope": 1.0,
+    "weightedMode": 3,
+    "inWeight": 0.0,
+    "outWeight": 0.0
+   },
+   {
+    "time": 1.0,
+    "value": 3.0,
+    "inSlope": 1.0,
+    "outSlope": Infinity,
+    "weightedMode": 1,
+    "inWeight": 0.0,
+    "outWeight": 0.0
+   }
+  ],
+  "amountCurve2_1": [
+   {
+    "time": 0.0,
+    "value": 0.0,
+    "inSlope": Infinity,
+    "outSlope": Infinity,
+    "weightedMode": 0,
+    "inWeight": 0.0,
+    "outWeight": 0.3333333432674408
+   },
+   {
+    "time": 0.20000000298023224,
+    "value": 1.0,
+    "inSlope": Infinity,
+    "outSlope": Infinity,
+    "weightedMode": 0,
+    "inWeight": 0.3333333432674408,
+    "outWeight": 0.3333333432674408
+   },
+   {
+    "time": 0.5,
+    "value": 2.0,
+    "inSlope": Infinity,
+    "outSlope": Infinity,
+    "weightedMode": 0,
+    "inWeight": 0.3333333432674408,
+    "outWeight": 0.3333333432674408
+   },
+   {
+    "time": 0.800000011920929,
+    "value": 3.0,
+    "inSlope": Infinity,
+    "outSlope": Infinity,
+    "weightedMode": 0,
+    "inWeight": 0.3333333432674408,
+    "outWeight": 0.3333333432674408
+   },
+   {
+    "time": 1.0,
+    "value": 3.0,
+    "inSlope": Infinity,
+    "outSlope": Infinity,
+    "weightedMode": 0,
+    "inWeight": 0.3333333432674408,
+    "outWeight": 0.0
+   }
+  ],
+  "amountCurve2_2": [
+   {
+    "time": 0.0,
+    "value": 3.0,
+    "inSlope": Infinity,
+    "outSlope": 1.0,
+    "weightedMode": 0,
+    "inWeight": 0.0,
+    "outWeight": 0.3333333432674408
+   },
+   {
+    "time": 1.0,
+    "value": 4.0,
+    "inSlope": 1.0,
+    "outSlope": Infinity,
+    "weightedMode": 0,
+    "inWeight": 0.3333333432674408,
+    "outWeight": 0.0
+   }
+  ],
+  "amountCurve3_1": [
+   {
+    "time": 0.0,
+    "value": 1.0,
+    "inSlope": Infinity,
+    "outSlope": Infinity,
+    "weightedMode": 0,
+    "inWeight": 0.0,
+    "outWeight": 0.3333333432674408
+   },
+   {
+    "time": 0.5,
+    "value": 2.0,
+    "inSlope": Infinity,
+    "outSlope": Infinity,
+    "weightedMode": 0,
+    "inWeight": 0.3333333432674408,
+    "outWeight": 0.3333333432674408
+   },
+   {
+    "time": 1.0,
+    "value": 3.0,
+    "inSlope": Infinity,
+    "outSlope": Infinity,
+    "weightedMode": 0,
+    "inWeight": 0.0,
+    "outWeight": 0.0
+   }
+  ],
+  "amountCurve3_2": [
+   {
+    "time": 0.0,
+    "value": 3.0,
+    "inSlope": Infinity,
+    "outSlope": 1.0,
+    "weightedMode": 0,
+    "inWeight": 0.0,
+    "outWeight": 0.3333333432674408
+   },
+   {
+    "time": 1.0,
+    "value": 4.0,
+    "inSlope": 1.0,
+    "outSlope": Infinity,
+    "weightedMode": 0,
+    "inWeight": 0.0,
+    "outWeight": 0.0
+   }
+  ]
  }
 }

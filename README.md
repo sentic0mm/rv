@@ -9,6 +9,7 @@ Durchsuchbare und sortierbare Liste aller Valuables aus den Leveln von R.E.P.O.,
 - **Valuables** – Suche (auch mit Map, z.B. `museum potion`; `/` springt ins Suchfeld, Enter öffnet den ersten Treffer), Filter nach Map, Value Type, Haltbarkeit, Größe und „nur Wiki-Korrekturen“, Sortieren und Gruppieren, Tabelle oder Karten, Detail-Fenster pro Item
 - **Schadens-Rechner** – Item wählen und sehen, ab welchem Tempoverlust es bricht, was ein Stoß kostet, wie viel Schaden es Monstern und Spielern macht und ob es ein Monster betäubt; mit Simulation („Leichter Stoß“, „Monster getroffen“ …)
 - **Level-Geld** – Level 1 bis 20+ wählen, Ziel des ersten Extraction Points eingeben, und die Seite rechnet wie das Spiel rückwärts aus, wie viel Geld im Level liegt; dazu eine Tabelle aller Level, Spiel gegen Wiki
+- **Monster** – wie viele Monster pro Level und Schwierigkeitsstufe spawnen und mit welcher Chance jedes einzelne dabei ist (simulierte komplette Runs mit den Regeln aus `EnemyDirector`)
 
 ## Dateien
 
@@ -17,7 +18,7 @@ Durchsuchbare und sortierbare Liste aller Valuables aus den Leveln von R.E.P.O.,
 | `index.html` | die fertige Seite (eine Datei, Bilder eingebettet, läuft auch offline) |
 | `build.py` | lädt Wiki-Text und Bilder neu, mischt `spieldaten.json` dazu und baut `index.html` aus `template.html` |
 | `template.html` | Oberfläche (HTML/CSS/JS), die Daten werden beim Bauen eingesetzt |
-| `spieldaten.py` | liest Valuable-Presets, Monster und die Kurven aus den installierten Spieldateien nach `spieldaten.json` |
+| `spieldaten.py` | liest Valuable-Presets, Monster, Monster-Spawnlisten und die Kurven aus den installierten Spieldateien nach `spieldaten.json` |
 | `spieldaten.json` | die ausgelesenen Spielwerte |
 | `serve.py`, `Server starten.bat` | optional: Seite vom eigenen PC aus teilen (Heimnetz, Radmin, mit `cloudflared.exe` im Ordner auch übers Internet) |
 

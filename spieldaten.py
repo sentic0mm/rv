@@ -15,12 +15,14 @@ DATA = os.path.join(GAME, 'REPO_Data')
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'spieldaten.json')
 
 WANT = {'Durability', 'Value', 'PhysAttribute', 'ValuableObject', 'Level', 'LevelValuables',
-        'RoundDirector', 'ValuableDirector', 'EnemyParent', 'Enemy', 'EnemyHealth'}
+        'RoundDirector', 'ValuableDirector', 'EnemyParent', 'Enemy', 'EnemyHealth',
+        'EnemyDirector', 'EnemySetup', 'RarityPreset'}
 ENEMY = {'EnemyParent', 'Enemy', 'EnemyHealth'}
 SIZES = ['tiny', 'small', 'medium', 'big', 'wide', 'tall', 'veryTall']
 SIZE_NAMES = ['Tiny', 'Small', 'Medium', 'Big', 'Wide', 'Tall', 'Very Tall']
 CURVES = ['haulGoalCurve1', 'haulGoalCurve2', 'totalMaxValueCurve1', 'totalMaxValueCurve2'] + \
-         [s + 'MaxAmountCurve' + n for s in SIZES for n in '12']
+         [s + 'MaxAmountCurve' + n for s in SIZES for n in '12'] + \
+         [f'amountCurve{t}_{n}' for t in '123' for n in '12']
 
 
 def quiet(fn, *a):
@@ -74,6 +76,7 @@ def main():
     for o, cls, extra in picked:
         d = quiet(o.read_typetree)
         d.update(extra)
+        d['_file'] = o.assets_file
         objs.setdefault(cls, {})[(o.assets_file, o.path_id)] = d
 
     def deref(src_file, ptr, cls):
@@ -143,11 +146,34 @@ def main():
             else:
                 e.update(health=d['health'], objectHurt=bool(d['objectHurt']),
                          objectHurtMultiplier=d['objectHurtMultiplier'], objectHurtStun=bool(d['objectHurtStun']))
+    for root, e in enemies.items():
+        e['prefab'] = root
     enemies = sorted((e for root, e in enemies.items() if root.startswith('Enemy - ') and 'name' in e),
                      key=lambda e: e['name'])
 
+    # Welche Monster-Setups der EnemyDirector pro Schwierigkeitsstufe ziehen kann
+    (director_key, director), = [(k, d) for k, d in objs['EnemyDirector'].items()]
+    spawn_tiers = []
+    for tier in '123':
+        setups = []
+        for ptr in director[f'enemiesDifficulty{tier}']:
+            s = deref(director_key[0], ptr, 'EnemySetup')
+            if s is None:
+                raise SystemExit(f'EnemySetup {ptr} nicht gefunden')
+            rarity = deref(s['_file'], s['rarityPreset'], 'RarityPreset') if s['rarityPreset']['m_PathID'] else None
+            setups.append({
+                'name': s['m_Name'].replace('Enemy - ', '').strip(),
+                'spawns': [p['prefabName'] for p in s['spawnObjects']],
+                'levelsCompletedCondition': bool(s['levelsCompletedCondition']),
+                'levelsCompletedMin': s['levelsCompletedMin'], 'levelsCompletedMax': s['levelsCompletedMax'],
+                'chance': rarity['chance'] if rarity else 100.0,
+                'rarity': rarity['m_Name'].replace('Rarity - ', '').strip() if rarity else None,
+                'runsPlayed': s['runsPlayed'],
+            })
+        spawn_tiers.append(setups)
+
     curves = {}
-    for cls in ('RoundDirector', 'ValuableDirector'):
+    for cls in ('RoundDirector', 'ValuableDirector', 'EnemyDirector'):
         (d,) = objs[cls].values()
         for k, v in d.items():
             if k in CURVES:
@@ -156,9 +182,11 @@ def main():
             elif re.fullmatch(r'(tiny|small|medium|big|wide|tall|veryTall)Chance', k):
                 curves[k] = v
 
-    out = {'unityVersion': version, 'maps': maps, 'special': special, 'enemies': enemies, 'curves': curves}
+    out = {'unityVersion': version, 'maps': maps, 'special': special, 'enemies': enemies,
+           'enemySpawnTiers': spawn_tiers, 'curves': curves}
     json.dump(out, open(OUT, 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
-    print(OUT, '-', {m: len(v) for m, v in maps.items()}, len(enemies), 'Monster,', len(curves), 'Kurven/Werte')
+    print(OUT, '-', {m: len(v) for m, v in maps.items()}, len(enemies), 'Monster,',
+          [len(t) for t in spawn_tiers], 'Spawn-Setups je Stufe,', len(curves), 'Kurven/Werte')
 
 
 if __name__ == '__main__':

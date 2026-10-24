@@ -245,7 +245,8 @@ def main():
     data = {
         'items': items,
         'types': [{'name': n, 'lo': lo, 'hi': hi, 'spawn': spawn_range(lo, hi)} for n, lo, hi in VALUE_TYPES],
-        'enemies': game['enemies'], 'curves': game['curves'], 'wikiLevels': parse_level_tables(t),
+        'enemies': game['enemies'], 'enemySpawnTiers': game['enemySpawnTiers'],
+        'curves': game['curves'], 'wikiLevels': parse_level_tables(t),
     }
     corrected = [i for i in items if i['wiki']]
     print(len(corrected), 'Items mit Korrekturen gegenüber dem Wiki:',
