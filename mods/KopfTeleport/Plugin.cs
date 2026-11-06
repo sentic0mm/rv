@@ -52,7 +52,7 @@ namespace KopfTeleport
             OnDeath = Config.Bind("Beim Sterben", "Aktiv", true,
                 "Kurz vor dem Tod zum aktiven Extraction Point teleportieren (sind alle fertig: in den Truck), " +
                 "damit der Kopf gleich dort landet. Braucht KEINE Mod beim Host.");
-            OnDeathToggleKey = Config.Bind("Beim Sterben", "Umschalt-Taste", Key.F8,
+            OnDeathToggleKey = Config.Bind("Beim Sterben", "Umschalt-Taste", Key.F5,
                 "Schaltet den Teleport beim Sterben im Spiel an/aus (wird in 'Aktiv' gespeichert).");
             OnDeathCarts = Config.Bind("Beim Sterben", "Auch Carts", true,
                 "Ist kein Extraction Point aktiv, beim Sterben ins nächste Cart / Pocket Cart teleportieren.");

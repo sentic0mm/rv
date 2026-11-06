@@ -7,7 +7,7 @@ A) BEIM STERBEN (automatisch, Host braucht die Mod NICHT)
      - alle Extraction Points fertig -> in den Truck
      - sonst                        -> ins naechste Cart / Pocket Cart
    Du siehst kurz den Sprung, dann stirbst du wie normal.
-   F8 schaltet das an/aus (wird gespeichert).
+   F5 schaltet das an/aus (wird gespeichert).
    Wiederbelebt wirst du wie im normalen Spiel: im Extraction Point, sobald er
    abgeschlossen wird, im Truck nach dem letzten Punkt. Im Cart nicht, aber deine
    Leute koennen dich so mitnehmen.
@@ -30,5 +30,5 @@ Installieren:
 Einstellungen (nach dem ersten Start): BepInEx\config\strehl.kopfteleport.cfg
   [Allgemein]     Taste      = F7
   [Beim Sterben]  Aktiv      = true
-                  Umschalt-Taste = F8
+                  Umschalt-Taste = F5
                   Auch Carts = true
