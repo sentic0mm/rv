@@ -14,7 +14,10 @@
 //    gleiche Revision -> nur Haltepunkt = point. Also zwei Nachrichten: (neu, Karotte) und (gleich, Kopfposition).
 //  - Die Karotte läuft auf dem NavMesh-Weg (wie Gegner laufen) immer ein Stück vor dem Kopf her.
 //
-// Host oder Singleplayer: einfach PhysGrabObject.Teleport (das darf der Host).
+// Host oder Singleplayer: kein Teleport mehr, sondern dasselbe Ziehen. Weil es dort kein Netz gibt (Singleplayer:
+// ViewID 0) bzw. GrabLinkRPC beim eigenen Greifer des Hosts den Zielpunkt ignoriert (!component.isLocal), setzt
+// die Mod die Greifer-Werte (playerGrabbing, grabbed, physGrabPoint, physGrabPointPullerPosition) direkt –
+// genau die Werte, die die Physik-Schleife des Hosts benutzt.
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -34,7 +37,7 @@ namespace KopfZieher
     public class Plugin : BaseUnityPlugin
     {
         public const string Guid = "strehl.kopfzieher";
-        public const string Version = "0.2.0";
+        public const string Version = "0.3.0";
 
         internal static ConfigEntry<Key> PullKey;
         internal static ConfigEntry<float> Lookahead;
@@ -115,22 +118,15 @@ namespace KopfZieher
             var target = FindTarget(pgo.transform.position);
             if (target == null) { Say("Kein Ziel: kein Extraction Point aktiv und kein Cart auf der Map.", false); return; }
 
-            if (SemiFunc.IsMasterClientOrSingleplayer())
-            {
-                // Als Host darf man direkt teleportieren
-                pgo.Teleport(target.Value.Pos + Vector3.up * 0.3f, target.Value.Rot);
-                Say($"Kopf -> {target.Value.Name}", true);
-                return;
-            }
-
+            bool local = SemiFunc.IsMasterClientOrSingleplayer();
             var grabber = me.physGrabber;
-            if (!grabber || !grabber.photonView) { Say("Kein Greifer gefunden?", false); return; }
+            if (!grabber || (!local && !grabber.photonView)) { Say("Kein Greifer gefunden?", false); return; }
             var view = PgoView(pgo);
-            if (!view) { Say("Kopf hat keine PhotonView?", false); return; }
+            if (!local && !view) { Say("Kopf hat keine PhotonView?", false); return; }
             int colliderId = ColliderId(pgo);
 
             cancel = false;
-            running = StartCoroutine(Pull(me, head, pgo, view, grabber, colliderId, target.Value));
+            running = StartCoroutine(Pull(me, head, pgo, view, grabber, colliderId, target.Value, local));
         }
 
         static int ColliderId(PhysGrabObject pgo)
@@ -147,9 +143,9 @@ namespace KopfZieher
         // ---------------- Ziehen ----------------
 
         IEnumerator Pull(PlayerAvatar me, PlayerDeathHead head, PhysGrabObject pgo, PhotonView headView,
-                         PhysGrabber grabber, int colliderId, Target target)
+                         PhysGrabber grabber, int colliderId, Target target, bool local)
         {
-            int grabberId = grabber.photonView.ViewID;
+            int grabberId = local ? 0 : grabber.photonView.ViewID;
             float start = Time.time;
             var startPos = pgo.transform.position;
             bool movedOnce = false;
@@ -160,13 +156,18 @@ namespace KopfZieher
             var corners = new List<Vector3>();
             string result = null; bool ok = false;
 
-            Say($"Ziehe Kopf -> {target.Name} … ({Plugin.PullKey.Value} = abbrechen)", true);
+            Say($"Ziehe Kopf -> {target.Name} … ({Plugin.PullKey.Value} = abbrechen){(local ? "  [lokal/Host]" : "")}", true);
             Pulling = true; PulledHead = pgo.transform; PullTarget = target.Pos;
 
             // Evtl. hängender Kraft-Sperr-Timer beim Host zurücksetzen (MasterAndOwnerOnly -> wir sind Besitzer)
-            TryRpc(grabber.photonView, "PhysGrabBeamDeactivateRPC", RpcTarget.MasterClient);
-            // "Mein Greifer hält jetzt den Kopf" – genau wie das Spiel es schickt
-            TryRpc(headView, "GrabStartedRPC", RpcTarget.MasterClient, grabberId);
+            if (local)
+                LocalStart(pgo, grabber);
+            else
+            {
+                TryRpc(grabber.photonView, "PhysGrabBeamDeactivateRPC", RpcTarget.MasterClient);
+                // "Mein Greifer hält jetzt den Kopf" – genau wie das Spiel es schickt
+                TryRpc(headView, "GrabStartedRPC", RpcTarget.MasterClient, grabberId);
+            }
 
             while (true)
             {
@@ -229,6 +230,14 @@ namespace KopfZieher
                     carrot = headPos + (headPos - carrot).normalized * 1f + Vector3.up * 0.5f; // kurz zurück, von der Kante weg
                 if (Time.time < liftUntil) carrot += Vector3.up * 1.2f;
 
+                if (local)
+                {
+                    LocalSet(pgo, grabber, headPos, carrot);
+                    Dbg($"[lokal] Kopf {headPos} Karotte {carrot} Rest {remaining:F1} m");
+                    yield return null;   // lokal: jeden Frame, flüssiger
+                    continue;
+                }
+
                 // Neue Revision nur, wenn sich die Karotte merklich bewegt hat
                 if (float.IsNaN(lastCarrot.x) || Vector3.Distance(carrot, lastCarrot) > 0.25f)
                 {
@@ -243,10 +252,61 @@ namespace KopfZieher
             }
 
             // Loslassen wie das Spiel es macht
-            TryRpc(headView, "GrabEndedRPC", RpcTarget.MasterClient, grabberId);
+            if (local) LocalEnd(pgo, grabber);
+            else TryRpc(headView, "GrabEndedRPC", RpcTarget.MasterClient, grabberId);
             running = null;
             Pulling = false; PulledHead = null;
             if (result != null) Say(result, ok);
+        }
+
+        // ---- lokaler Weg (Host / Singleplayer): Greifer-Werte direkt setzen ----
+        static readonly AccessTools.FieldRef<PhysGrabber, PhysGrabObject> GrabbedPgo = AccessTools.FieldRefAccess<PhysGrabber, PhysGrabObject>("grabbedPhysGrabObject");
+
+        static void LocalStart(PhysGrabObject pgo, PhysGrabber g)
+        {
+            g.physGrabForcesDisabledTimer = 0f;
+            GrabbedPgo(g) = pgo;
+            g.grabbedObjectTransform = pgo.transform;
+            g.localGrabPosition = Vector3.zero;
+            // Aktuelle Drehung des Kopfes halten – wie GrabLinkRPC es setzt
+            try
+            {
+                var ot = g.playerAvatar && g.playerAvatar.localCamera ? g.playerAvatar.localCamera.GetOverrideTransform() : null;
+                if (ot)
+                {
+                    g.cameraRelativeGrabbedForward = ot.InverseTransformDirection(pgo.transform.forward).normalized;
+                    g.cameraRelativeGrabbedUp = ot.InverseTransformDirection(pgo.transform.up).normalized;
+                }
+                else { g.cameraRelativeGrabbedForward = Vector3.forward; g.cameraRelativeGrabbedUp = Vector3.up; }
+            }
+            catch { g.cameraRelativeGrabbedForward = Vector3.forward; g.cameraRelativeGrabbedUp = Vector3.up; }
+            g.grabbed = true;
+            if (!pgo.playerGrabbing.Contains(g)) pgo.playerGrabbing.Add(g);
+        }
+
+        static void LocalSet(PhysGrabObject pgo, PhysGrabber g, Vector3 headPos, Vector3 carrot)
+        {
+            g.grabbed = true;
+            g.physGrabForcesDisabledTimer = 0f;
+            if (!pgo.playerGrabbing.Contains(g)) pgo.playerGrabbing.Add(g);
+            if (g.physGrabPoint) g.physGrabPoint.position = headPos;   // Haltepunkt = Kopf
+            g.physGrabPointPullerPosition = carrot;                    // Zielpunkt = Karotte
+            if (g.physGrabPointPuller) g.physGrabPointPuller.position = carrot;
+        }
+
+        static void LocalEnd(PhysGrabObject pgo, PhysGrabber g)
+        {
+            try
+            {
+                if (pgo) pgo.playerGrabbing.Remove(g);
+                if (g)
+                {
+                    g.grabbed = false;
+                    GrabbedPgo(g) = null;
+                    g.grabbedObjectTransform = null;
+                }
+            }
+            catch (Exception e) { Plugin.Log.LogWarning("LocalEnd: " + e.Message); }
         }
 
         void Link(PhotonView headView, int grabberId, int colliderId, Vector3 point, int rev)

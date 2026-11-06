@@ -1,4 +1,4 @@
-KopfZieher 0.2 fuer R.E.P.O.  (EXPERIMENTELL)
+KopfZieher 0.3 fuer R.E.P.O.  (EXPERIMENTELL)
 =============================================
 
 Bist du tot, zieht F9 deinen eigenen Kopf durch die Gaenge:
@@ -9,7 +9,8 @@ Einmal F9 = laeuft, bis der Kopf am Ziel ist. F9 nochmal = abbrechen.
 
 Der Host braucht die Mod NICHT. Das ist kein Teleport: Der Kopf schwebt
 wie getragen den Weg entlang, den auch die Gegner laufen (NavMesh).
-Als Host oder im Singleplayer wird direkt teleportiert.
+Auch als Host und im Singleplayer wird gezogen (kein Teleport) - dort
+setzt die Mod die Greifer-Werte direkt, jeden Frame.
 
 Was passieren kann:
   - "Kopf bewegt sich nicht ..."  -> der Host nimmt es so nicht an,
