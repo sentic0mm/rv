@@ -22,7 +22,7 @@ namespace KopfKamera
     public class Plugin : BaseUnityPlugin
     {
         public const string Guid = "strehl.kopfkamera";
-        public const string Version = "0.2.0";
+        public const string Version = "0.3.0";
 
         internal static ConfigEntry<Key> ToggleKey;
         internal static ConfigEntry<bool> AutoWithPuller;
@@ -67,6 +67,8 @@ namespace KopfKamera
         static readonly AccessTools.FieldRef<PlayerDeathHead, PhysGrabObject> HeadPgo = AccessTools.FieldRefAccess<PlayerDeathHead, PhysGrabObject>("physGrabObject");
         static readonly AccessTools.FieldRef<PhysGrabObject, RoomVolumeCheck> PgoRooms = AccessTools.FieldRefAccess<PhysGrabObject, RoomVolumeCheck>("roomVolumeCheck");
         static readonly AccessTools.FieldRef<SpectateCamera, PlayerAvatar> SpecPlayer = AccessTools.FieldRefAccess<SpectateCamera, PlayerAvatar>("player");
+        static readonly AccessTools.FieldRef<SpectateCamera, Camera> TopCam = AccessTools.FieldRefAccess<SpectateCamera, Camera>("TopCamera");
+        static readonly AccessTools.FieldRef<SpectateCamera, float> PrevFar = AccessTools.FieldRefAccess<SpectateCamera, float>("previousFarClipPlane");
         static readonly AccessTools.FieldRef<SpectateCamera, Camera> MainCam = AccessTools.FieldRefAccess<SpectateCamera, Camera>("MainCamera");
 
         // KopfZieher ist optional: nur per Reflection angefasst
@@ -74,6 +76,8 @@ namespace KopfKamera
         static bool pullerLooked;
 
         bool manual;
+        // Was die Todes-Kamera vorher hatte -> beim Ausschalten zurück
+        Vector3 savedCamLocalPos; float savedFov, savedNear, savedFar; bool savedFog; bool saved;
         float yaw, pitch = 20f, dist;
         bool wasActive;
         Vector3 lastHeadPos; float headSpeed;
@@ -144,6 +148,15 @@ namespace KopfKamera
                 if (wasActive)
                 {
                     wasActive = false;
+                    var c = MainCam(sc);
+                    if (saved && c)
+                    {
+                        c.transform.localPosition = savedCamLocalPos;
+                        c.fieldOfView = savedFov; c.nearClipPlane = savedNear; c.farClipPlane = savedFar;
+                        var tc = TopCam(sc); if (tc) tc.fieldOfView = savedFov;
+                        RenderSettings.fog = savedFog;
+                    }
+                    saved = false;
                     // Licht-Culling wieder dem Spiel zurückgeben (wie in SpectateCamera.UpdatePlayer)
                     var pl = SpecPlayer(sc);
                     SemiFunc.LightManagerSetCullTargetTransform(pl ? pl.transform : sc.transform);
@@ -156,6 +169,13 @@ namespace KopfKamera
             {
                 yaw = sc.transform.eulerAngles.y;
                 wasActive = true;
+                var c0 = MainCam(sc);
+                if (c0)
+                {
+                    savedCamLocalPos = c0.transform.localPosition;
+                    savedFov = c0.fieldOfView; savedNear = c0.nearClipPlane; savedFar = c0.farClipPlane;
+                    savedFog = RenderSettings.fog; saved = true;
+                }
             }
 
             yaw += SemiFunc.InputMouseX() * 2f;
@@ -181,19 +201,34 @@ namespace KopfKamera
                 SemiFunc.LightManagerSetCullTargetTransform(pgo.transform);
 
             // Nicht durch Wände schauen
+            // Nur feste Wände zählen – keine Gegenstände mit Physik (sonst trifft der Strahl den eigenen Kopf)
             float d = dist;
-            if (Physics.SphereCast(center, 0.2f, back, out var hit, dist, SemiFunc.LayerMaskGetVisionObstruct(), QueryTriggerInteraction.Ignore))
-                d = Mathf.Max(hit.distance - 0.1f, 0.3f);
+            foreach (var h in Physics.SphereCastAll(center, 0.2f, back, dist, SemiFunc.LayerMaskGetVisionObstruct(), QueryTriggerInteraction.Ignore))
+            {
+                if (h.rigidbody && !h.rigidbody.isKinematic) continue;
+                if (h.collider && h.collider.GetComponentInParent<PhysGrabObject>()) continue;
+                if (h.distance > 0f) d = Mathf.Min(d, Mathf.Max(h.distance - 0.1f, 0.3f));
+            }
 
             sc.transform.position = center + back * d;
             sc.transform.rotation = rot;
             // CameraAim hängt unter der Halterung – im Head-Modus dreht er sonst mit
             if (CameraAim.Instance) CameraAim.Instance.transform.localRotation = Quaternion.identity;
+            // Todes-Kamera (bleibt im Singleplayer dauerhaft an): 50 m zurück, 8° Sichtfeld, Near-Clip 70 m.
+            // Jeden Frame auf normale Spielerwerte setzen, weil SpectateCamera sie jeden Frame wieder hinzieht.
             var cam = MainCam(sc);
             if (cam)
             {
+                cam.transform.localPosition = Vector3.zero;
                 cam.transform.localRotation = Quaternion.identity;
                 cam.nearClipPlane = 0.01f;
+                float fov = CameraZoom.Instance ? CameraZoom.Instance.playerZoomDefault : 70f;
+                cam.fieldOfView = fov;
+                var tc = TopCam(sc); if (tc) tc.fieldOfView = fov;
+                float far = PrevFar(sc);
+                if (far > 1f) cam.farClipPlane = far;
+                RenderSettings.fog = true;
+                RenderSettings.fogStartDistance = 0.01f;
             }
         }
 
