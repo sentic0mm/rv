@@ -22,7 +22,7 @@ namespace KopfKamera
     public class Plugin : BaseUnityPlugin
     {
         public const string Guid = "strehl.kopfkamera";
-        public const string Version = "0.1.0";
+        public const string Version = "0.2.0";
 
         internal static ConfigEntry<Key> ToggleKey;
         internal static ConfigEntry<bool> AutoWithPuller;
@@ -65,6 +65,8 @@ namespace KopfKamera
         static readonly AccessTools.FieldRef<PlayerAvatar, PlayerDeathHead> DeathHead = AccessTools.FieldRefAccess<PlayerAvatar, PlayerDeathHead>("playerDeathHead");
         static readonly AccessTools.FieldRef<PlayerDeathHead, bool> Triggered = AccessTools.FieldRefAccess<PlayerDeathHead, bool>("triggered");
         static readonly AccessTools.FieldRef<PlayerDeathHead, PhysGrabObject> HeadPgo = AccessTools.FieldRefAccess<PlayerDeathHead, PhysGrabObject>("physGrabObject");
+        static readonly AccessTools.FieldRef<PhysGrabObject, RoomVolumeCheck> PgoRooms = AccessTools.FieldRefAccess<PhysGrabObject, RoomVolumeCheck>("roomVolumeCheck");
+        static readonly AccessTools.FieldRef<SpectateCamera, PlayerAvatar> SpecPlayer = AccessTools.FieldRefAccess<SpectateCamera, PlayerAvatar>("player");
         static readonly AccessTools.FieldRef<SpectateCamera, Camera> MainCam = AccessTools.FieldRefAccess<SpectateCamera, Camera>("MainCamera");
 
         // KopfZieher ist optional: nur per Reflection angefasst
@@ -139,7 +141,13 @@ namespace KopfKamera
 
             if (!active)
             {
-                if (wasActive) wasActive = false;
+                if (wasActive)
+                {
+                    wasActive = false;
+                    // Licht-Culling wieder dem Spiel zurückgeben (wie in SpectateCamera.UpdatePlayer)
+                    var pl = SpecPlayer(sc);
+                    SemiFunc.LightManagerSetCullTargetTransform(pl ? pl.transform : sc.transform);
+                }
                 return;
             }
 
@@ -157,6 +165,20 @@ namespace KopfKamera
             var center = pgo.centerPoint;
             var rot = Quaternion.Euler(pitch, yaw, 0f);
             var back = rot * Vector3.back;
+
+            // Räume und Licht um den KOPF zeichnen, nicht um den beobachteten Spieler.
+            // SpectateCamera.RoomVolumeLogic kopiert im normalen Modus die Räume des beobachteten Spielers
+            // (oder keine) -> nach ein paar Sekunden ist um den Kopf alles ausgeblendet. Im Head-Modus macht
+            // das Spiel genau das hier: Räume des Kopfes übernehmen.
+            var me = SemiFunc.PlayerAvatarLocal();
+            var headRooms = PgoRooms(pgo);
+            if (me && me.RoomVolumeCheck && headRooms)
+            {
+                me.RoomVolumeCheck.CurrentRooms.Clear();
+                me.RoomVolumeCheck.CurrentRooms.AddRange(headRooms.CurrentRooms);
+            }
+            if (LightManager.instance && LightManager.instance.lightCullTarget != pgo.transform)
+                SemiFunc.LightManagerSetCullTargetTransform(pgo.transform);
 
             // Nicht durch Wände schauen
             float d = dist;
