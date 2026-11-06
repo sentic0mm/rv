@@ -1,0 +1,12 @@
+KeinGameOver 0.1 fuer R.E.P.O.  (TEMPORAER, NUR ZUM TESTEN)
+=============================================================
+
+Nur im Singleplayer:
+  - Wenn du stirbst, endet die Runde nicht - du bleibst als Zuschauer tot
+    im Level und kannst KopfTeleport / KopfZieher / KopfKamera testen.
+  - Der Speicherstand wird nicht automatisch geloescht (weder bei "alle tot"
+    noch beim Verlassen im ersten Level).
+  - Zum Beenden: Menue > Spiel verlassen. Der Save bleibt.
+  - F11 schaltet die Mod im Spiel an/aus.
+Im Multiplayer macht die Mod nichts.
+Nach dem Testen wieder rausnehmen.

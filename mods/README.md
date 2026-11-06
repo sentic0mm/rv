@@ -7,6 +7,7 @@ Drei BepInEx-Mods rund um den eigenen Kopf nach dem Tod. Fertige DLLs liegen jew
 | **KopfTeleport** | F8 an/aus | nein | Kurz vor dem Tod zum aktiven Extraction Point teleportieren (sonst Truck, wenn alle fertig, sonst Cart) – der Kopf landet gleich dort |
 | | F7 | ja | Kopf nachträglich wegteleportieren, wenn man schon tot ist |
 | **KopfZieher** (experimentell) | F9 | nein | Zieht den toten Kopf mit dem eigenen Greifer über das NavMesh bis ins Ziel; läuft, bis er da ist (F9 nochmal = abbrechen) |
+| **KeinGameOver** (temporär) | F11 an/aus | – | Nur Singleplayer: Sterben beendet die Runde nicht, Save wird nicht automatisch gelöscht – zum Testen der anderen Mods |
 | **KopfKamera** (Debug) | F10 | nein | 3rd-Person-Kamera hinter dem eigenen Kopf, automatisch während KopfZieher zieht; Debug-Text mit Tempo und Restweg |
 
 ## Warum was geht
