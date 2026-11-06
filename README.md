@@ -11,6 +11,10 @@ Durchsuchbare und sortierbare Liste aller Valuables aus den Leveln von R.E.P.O.,
 - **Level-Geld** – Level 1 bis 20+ wählen, Ziel des ersten Extraction Points eingeben, und die Seite rechnet wie das Spiel rückwärts aus, wie viel Geld im Level liegt; dazu eine Tabelle aller Level, Spiel gegen Wiki
 - **Monster** – wie viele Monster pro Level und Schwierigkeitsstufe spawnen und mit welcher Chance jedes einzelne dabei ist (simulierte komplette Runs mit den Regeln aus `EnemyDirector`)
 
+## Mods
+
+Im Ordner [`mods/`](mods/) liegen eigene BepInEx-Mods rund um den Kopf nach dem Tod (KopfTeleport, KopfZieher, KopfKamera) – siehe [`mods/README.md`](mods/README.md).
+
 ## Dateien
 
 | Datei | Zweck |

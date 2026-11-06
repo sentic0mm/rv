@@ -1,3 +1,6 @@
 cache/
 cloudflared.exe
 __pycache__/
+mods/*/bin/
+mods/*/obj/
+mods/*/*_fuer_Freunde.zip

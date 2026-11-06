@@ -1,0 +1,33 @@
+KopfZieher 0.2 fuer R.E.P.O.  (EXPERIMENTELL)
+=============================================
+
+Bist du tot, zieht F9 deinen eigenen Kopf durch die Gaenge:
+  - Extraction Point aktiv       -> in den Extraction Point
+  - alle Extraction Points fertig -> in den Truck
+  - sonst                         -> ins naechste Cart / Pocket Cart
+Einmal F9 = laeuft, bis der Kopf am Ziel ist. F9 nochmal = abbrechen.
+
+Der Host braucht die Mod NICHT. Das ist kein Teleport: Der Kopf schwebt
+wie getragen den Weg entlang, den auch die Gegner laufen (NavMesh).
+Als Host oder im Singleplayer wird direkt teleportiert.
+
+Was passieren kann:
+  - "Kopf bewegt sich nicht ..."  -> der Host nimmt es so nicht an,
+    dann klappt es in dieser Spielversion nicht.
+  - Geschlossene Tueren, enge Ecken: Kopf kann haengen. Die Mod hebt ihn
+    dann an, zieht ihn kurz zurueck und versucht es immer wieder.
+  - Sie hoert nur auf, wenn der Kopf am Ziel ist, du F9 drueckst,
+    du wiederbelebt wirst oder das Level endet.
+  - Tipp: KopfKamera (F10) zeigt dir den Kopf von hinten.
+  - Die anderen sehen deinen Kopf durch die Gaenge schweben.
+
+Installieren:
+  KopfZieher.dll nach  BepInEx\plugins\  kopieren.
+  Vertraegt sich mit KopfTeleport (F7 / Teleport beim Sterben).
+
+Einstellungen: BepInEx\config\strehl.kopfzieher.cfg
+  [Allgemein]   Taste        = F9
+  [Feintuning]  Vorlauf      = 1.5   (m, wie weit der Zielpunkt vorausliegt)
+                Tragehoehe   = 0.8   (m ueber dem Boden)
+                Max Sekunden = 0     (0 = kein Zeitlimit)
+                Debug Log    = false (true = jeden Schritt ins Log, zum Fehlersuchen)

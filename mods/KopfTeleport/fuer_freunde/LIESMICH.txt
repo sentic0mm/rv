@@ -1,0 +1,34 @@
+KopfTeleport 1.2 fuer R.E.P.O.
+==============================
+
+A) BEIM STERBEN (automatisch, Host braucht die Mod NICHT)
+   Kurz bevor du stirbst, wirst du teleportiert - dein Kopf landet gleich dort:
+     - Extraction Point aktiv      -> in den Extraction Point
+     - alle Extraction Points fertig -> in den Truck
+     - sonst                        -> ins naechste Cart / Pocket Cart
+   Du siehst kurz den Sprung, dann stirbst du wie normal.
+   F8 schaltet das an/aus (wird gespeichert).
+   Wiederbelebt wirst du wie im normalen Spiel: im Extraction Point, sobald er
+   abgeschlossen wird, im Truck nach dem letzten Punkt. Im Cart nicht, aber deine
+   Leute koennen dich so mitnehmen.
+
+B) F7, WENN DU SCHON TOT BIST (Host braucht die Mod)
+   Bringt deinen Kopf nachtraeglich weg - gleiche Reihenfolge wie oben.
+   F7 nochmal innerhalb von 5 Sekunden = naechstes Cart.
+   Im aktuellen R.E.P.O. darf nur der Host Koepfe bewegen. Hat er die Mod nicht,
+   kommt die Meldung "Keine Antwort vom Host ...".
+
+- Bewegt immer nur dich bzw. deinen eigenen Kopf, nie andere.
+- Eingesteckte Pocket Carts (im Inventar) werden uebersprungen.
+- Nicht in der Arena / im Shop.
+
+Installieren:
+  KopfTeleport.dll nach  BepInEx\plugins\  kopieren
+  (Thunderstore/r2modman: Profil -> "Open profile folder" -> BepInEx\plugins).
+  Die alte HeadTeleport.dll bitte rausnehmen (gleiche Taste).
+
+Einstellungen (nach dem ersten Start): BepInEx\config\strehl.kopfteleport.cfg
+  [Allgemein]     Taste      = F7
+  [Beim Sterben]  Aktiv      = true
+                  Umschalt-Taste = F8
+                  Auch Carts = true
