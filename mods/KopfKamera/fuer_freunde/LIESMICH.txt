@@ -1,13 +1,13 @@
-KopfKamera 0.3 fuer R.E.P.O.  (DEBUG)
+KopfKamera 0.4 fuer R.E.P.O.  (DEBUG)
 =====================================
 
 Wenn du tot bist: 3rd-Person-Kamera hinter deinem eigenen Kopf.
-  - Geht automatisch an, solange KopfZieher (F9) deinen Kopf zieht.
-  - F10 schaltet sie jederzeit von Hand an/aus.
+  - Geht automatisch an, sobald du tot bist und dein Kopf liegt.
+  - F10 schaltet sie fuer dieses Leben aus (bzw. wieder an).
   - Maus = um den Kopf drehen, Mausrad = Abstand.
   - Oben links: Debug-Text (Kopfposition, Tempo in m/s, Abstand zum Ziel).
 Nur deine eigene Kamera - an andere Spieler geht nichts.
 
 Einstellungen: BepInEx\config\strehl.kopfkamera.cfg
-  [Allgemein] Taste = F10, Auto mit KopfZieher = true, Abstand = 3
+  [Allgemein] Taste = F10, Auto wenn tot = true, Auto mit KopfZieher = true, Abstand = 3
   [Debug]     Text anzeigen = true

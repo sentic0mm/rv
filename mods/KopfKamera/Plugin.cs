@@ -22,10 +22,11 @@ namespace KopfKamera
     public class Plugin : BaseUnityPlugin
     {
         public const string Guid = "strehl.kopfkamera";
-        public const string Version = "0.3.0";
+        public const string Version = "0.4.0";
 
         internal static ConfigEntry<Key> ToggleKey;
         internal static ConfigEntry<bool> AutoWithPuller;
+        internal static ConfigEntry<bool> AutoWhenDead;
         internal static ConfigEntry<float> Distance;
         internal static ConfigEntry<bool> ShowDebug;
         internal static ManualLogSource Log;
@@ -35,6 +36,8 @@ namespace KopfKamera
             Log = Logger;
             ToggleKey = Config.Bind("Allgemein", "Taste", Key.F10, "3rd-Person-Kamera auf den eigenen Kopf an/aus (nur wenn tot).");
             AutoWithPuller = Config.Bind("Allgemein", "Auto mit KopfZieher", true, "Automatisch an, solange KopfZieher den Kopf zieht.");
+            AutoWhenDead = Config.Bind("Allgemein", "Auto wenn tot", true,
+                "Automatisch an, sobald du tot bist und dein Kopf liegt. F10 schaltet sie dann für dieses Leben aus.");
             Distance = Config.Bind("Allgemein", "Abstand", 3f, "Start-Abstand der Kamera zum Kopf (m). Mausrad ändert ihn im Spiel.");
             ShowDebug = Config.Bind("Debug", "Text anzeigen", true, "Debug-Text oben links anzeigen.");
 
@@ -75,13 +78,17 @@ namespace KopfKamera
         static PropertyInfo pullingProp, targetProp;
         static bool pullerLooked;
 
-        bool manual;
+        bool? manual;          // null = automatisch, sonst von Hand per F10 erzwungen
+        bool wasDead;
+        Transform savedCullTarget;
         // Was die Todes-Kamera vorher hatte -> beim Ausschalten zurück
         Vector3 savedCamLocalPos; float savedFov, savedNear, savedFar; bool savedFog; bool saved;
         float yaw, pitch = 20f, dist;
         bool wasActive;
         Vector3 lastHeadPos; float headSpeed;
         string status = "";
+
+        bool currentlyActive;
 
         void Awake() { Instance = this; dist = Plugin.Distance.Value; }
 
@@ -111,9 +118,10 @@ namespace KopfKamera
             var kb = Keyboard.current;
             if (kb != null && kb[Plugin.ToggleKey.Value].wasPressedThisFrame)
             {
-                manual = !manual;
-                Plugin.Log.LogInfo($"KopfKamera {(manual ? "an" : "aus")}");
-                try { SemiFunc.UIFocusText(manual ? "KopfKamera: AN" : "KopfKamera: AUS", Color.white, manual ? Color.green : Color.red, 2f); } catch { }
+                bool now = !(currentlyActive);
+                manual = now;
+                Plugin.Log.LogInfo($"KopfKamera {(now ? "an" : "aus")}");
+                try { SemiFunc.UIFocusText(now ? "KopfKamera: AN" : "KopfKamera: AUS", Color.white, now ? Color.green : Color.red, 2f); } catch { }
             }
         }
 
@@ -130,14 +138,20 @@ namespace KopfKamera
         {
             var pgo = MyHead();
             bool pulling = PullerActive(out var target);
-            bool active = pgo && (manual || (pulling && Plugin.AutoWithPuller.Value));
+            // Neues Leben -> wieder automatisch
+            bool dead = pgo;
+            if (dead && !wasDead) manual = null;
+            wasDead = dead;
+            bool auto = Plugin.AutoWhenDead.Value || (pulling && Plugin.AutoWithPuller.Value);
+            bool active = pgo && (manual ?? auto);
+            currentlyActive = active;
 
             if (pgo)
             {
                 var p = pgo.centerPoint;
                 if (Time.deltaTime > 0f) headSpeed = Mathf.Lerp(headSpeed, Vector3.Distance(p, lastHeadPos) / Time.deltaTime, 0.1f);
                 lastHeadPos = p;
-                status = $"KopfKamera {(active ? "AN" : "aus")} ({(manual ? "Hand" : "auto")})\n" +
+                status = $"KopfKamera {(active ? "AN" : "aus")} ({(manual.HasValue ? "Hand" : "auto")})\n" +
                          $"Kopf: {p.x:F1} {p.y:F1} {p.z:F1}   Tempo: {headSpeed:F1} m/s\n" +
                          (pulling ? $"KopfZieher: zieht   Ziel noch {Vector3.Distance(p, target):F1} m" : "KopfZieher: wartet");
             }
@@ -157,9 +171,11 @@ namespace KopfKamera
                         RenderSettings.fog = savedFog;
                     }
                     saved = false;
-                    // Licht-Culling wieder dem Spiel zurückgeben (wie in SpectateCamera.UpdatePlayer)
+                    // Licht-Culling genau dorthin zurück, wo es vorher war (Todes-Kamera: Spectate-Punkt, sonst Spieler)
                     var pl = SpecPlayer(sc);
-                    SemiFunc.LightManagerSetCullTargetTransform(pl ? pl.transform : sc.transform);
+                    var cullBack = savedCullTarget ? savedCullTarget : (pl ? pl.transform : sc.transform);
+                    SemiFunc.LightManagerSetCullTargetTransform(cullBack);
+                    savedCullTarget = null;
                 }
                 return;
             }
@@ -176,6 +192,7 @@ namespace KopfKamera
                     savedFov = c0.fieldOfView; savedNear = c0.nearClipPlane; savedFar = c0.farClipPlane;
                     savedFog = RenderSettings.fog; saved = true;
                 }
+                if (LightManager.instance) savedCullTarget = LightManager.instance.lightCullTarget;
             }
 
             yaw += SemiFunc.InputMouseX() * 2f;
