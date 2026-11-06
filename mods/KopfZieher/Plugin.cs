@@ -37,13 +37,14 @@ namespace KopfZieher
     public class Plugin : BaseUnityPlugin
     {
         public const string Guid = "strehl.kopfzieher";
-        public const string Version = "0.3.0";
+        public const string Version = "0.4.0";
 
         internal static ConfigEntry<Key> PullKey;
         internal static ConfigEntry<float> Lookahead;
         internal static ConfigEntry<float> CarryHeight;
         internal static ConfigEntry<float> MaxSeconds;
         internal static ConfigEntry<bool> DebugLog;
+        internal static ConfigEntry<bool> ShowPath;
         internal static ManualLogSource Log;
 
         void Awake()
@@ -55,7 +56,8 @@ namespace KopfZieher
                 "So viele Meter läuft der Zielpunkt auf dem Weg vor dem Kopf her.");
             CarryHeight = Config.Bind("Feintuning", "Tragehoehe", 0.8f, "So hoch über dem Boden wird der Kopf getragen (m).");
             MaxSeconds = Config.Bind("Feintuning", "Max Sekunden", 0f, "Danach gibt die Mod auf. 0 = nie, läuft bis der Kopf am Ziel ist.");
-            DebugLog = Config.Bind("Feintuning", "Debug Log", false, "Jeden Schritt ins BepInEx-Log schreiben.");
+            DebugLog = Config.Bind("Feintuning", "Debug Log", true, "Jeden Schritt ins BepInEx-Log schreiben.");
+            ShowPath = Config.Bind("Feintuning", "Weg anzeigen", true, "Geplanten Weg (gelb) und Zielpunkt (rot) im Spiel anzeigen – nur bei dir.");
 
             var go = new GameObject("KopfZieher");
             DontDestroyOnLoad(go);
@@ -73,6 +75,7 @@ namespace KopfZieher
         public static bool Pulling { get; private set; }
         public static Transform PulledHead { get; private set; }
         public static Vector3 PullTarget { get; private set; }
+        public static string PathInfo { get; private set; } = "";
 
         static readonly AccessTools.FieldRef<PlayerAvatar, bool> DeadSet = AccessTools.FieldRefAccess<PlayerAvatar, bool>("deadSet");
         static readonly AccessTools.FieldRef<PlayerAvatar, bool> IsDisabled = AccessTools.FieldRefAccess<PlayerAvatar, bool>("isDisabled");
@@ -225,10 +228,20 @@ namespace KopfZieher
                 if (remaining < Plugin.Lookahead.Value + 0.5f || corners.Count < 2)
                     carrot = target.Pos + Vector3.up * 0.4f;      // letzter Meter: direkt aufs Ziel
                 else
-                    carrot = PointAhead(corners, seg, onPath, Plugin.Lookahead.Value) + Vector3.up * Plugin.CarryHeight.Value;
+                {
+                    var p = PointAhead(corners, seg, onPath, Plugin.Lookahead.Value);
+                    p.y = FloorY(p) + Plugin.CarryHeight.Value;  // Höhe immer vom echten Boden aus
+                    carrot = p;
+                }
                 if (Time.time < backOffUntil && corners.Count >= 2)
-                    carrot = headPos + (headPos - carrot).normalized * 1f + Vector3.up * 0.5f; // kurz zurück, von der Kante weg
-                if (Time.time < liftUntil) carrot += Vector3.up * 1.2f;
+                {
+                    // ein Stück den Weg zurück (zum letzten Eckpunkt), nicht einfach "weg von der Karotte"
+                    var prev = corners[Mathf.Max(seg, 0)];
+                    carrot = new Vector3(prev.x, FloorY(prev) + Plugin.CarryHeight.Value, prev.z);
+                }
+                // Anheben nur, wenn der Kopf nicht eh schon hoch hängt (sonst klebt er an der Decke)
+                if (Time.time < liftUntil && headPos.y - FloorY(headPos) < 1.5f) carrot += Vector3.up * 1.0f;
+                DrawDebug(corners, carrot);
 
                 if (local)
                 {
@@ -256,7 +269,51 @@ namespace KopfZieher
             else TryRpc(headView, "GrabEndedRPC", RpcTarget.MasterClient, grabberId);
             running = null;
             Pulling = false; PulledHead = null;
+            HideDebug();
             if (result != null) Say(result, ok);
+        }
+
+        // ---- Weg sichtbar machen (nur lokal) ----
+        static LineRenderer pathLine;
+        static GameObject carrotMarker;
+
+        static void DrawDebug(List<Vector3> corners, Vector3 carrot)
+        {
+            if (!Plugin.ShowPath.Value) { HideDebug(); return; }
+            try
+            {
+                if (!pathLine)
+                {
+                    var go = new GameObject("KopfZieher_Weg");
+                    pathLine = go.AddComponent<LineRenderer>();
+                    pathLine.material = new Material(Shader.Find("Hidden/Internal-Colored"));
+                    pathLine.startColor = pathLine.endColor = Color.yellow;
+                    pathLine.startWidth = pathLine.endWidth = 0.06f;
+                    pathLine.useWorldSpace = true;
+                }
+                if (!carrotMarker)
+                {
+                    carrotMarker = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                    carrotMarker.name = "KopfZieher_Ziel";
+                    UnityEngine.Object.Destroy(carrotMarker.GetComponent<Collider>());
+                    carrotMarker.transform.localScale = Vector3.one * 0.2f;
+                    var r = carrotMarker.GetComponent<Renderer>();
+                    r.material = new Material(Shader.Find("Hidden/Internal-Colored"));
+                    r.material.color = Color.red;
+                }
+                pathLine.gameObject.SetActive(true);
+                carrotMarker.SetActive(true);
+                pathLine.positionCount = corners.Count;
+                for (int i = 0; i < corners.Count; i++) pathLine.SetPosition(i, corners[i] + Vector3.up * 0.15f);
+                carrotMarker.transform.position = carrot;
+            }
+            catch (Exception e) { Plugin.Log.LogWarning("Weg anzeigen: " + e.Message); Plugin.ShowPath.Value = false; }
+        }
+
+        static void HideDebug()
+        {
+            if (pathLine) pathLine.gameObject.SetActive(false);
+            if (carrotMarker) carrotMarker.SetActive(false);
         }
 
         // ---- lokaler Weg (Host / Singleplayer): Greifer-Werte direkt setzen ----
@@ -324,24 +381,45 @@ namespace KopfZieher
 
         static readonly NavMeshPath navPath = new NavMeshPath();
 
+        static readonly int FloorMask = LayerMask.GetMask("Default");
+
+        // Wie das Spiel selbst: erst senkrecht auf den Boden, dann den NavMesh-Punkt dort.
+        // (Direkt um den Kopf suchen trifft sonst NavMesh-Stücke oben auf Felsen/Balken.)
+        static bool FloorPoint(Vector3 p, out Vector3 nav)
+        {
+            nav = p;
+            if (Physics.Raycast(p + Vector3.up * 0.3f, Vector3.down, out var hit, 12f, FloorMask, QueryTriggerInteraction.Ignore) &&
+                NavMesh.SamplePosition(hit.point, out var n, 1.5f, NavMesh.AllAreas))
+            { nav = n.position; return true; }
+            if (NavMesh.SamplePosition(p, out var n2, 4f, NavMesh.AllAreas)) { nav = n2.position; return true; }
+            return false;
+        }
+
+        static float FloorY(Vector3 p)
+        {
+            return Physics.Raycast(p + Vector3.up * 0.3f, Vector3.down, out var hit, 12f, FloorMask, QueryTriggerInteraction.Ignore)
+                ? hit.point.y : p.y - 1f;
+        }
+
         static void BuildPath(Vector3 from, Vector3 to, List<Vector3> corners)
         {
             corners.Clear();
-            if (NavMesh.SamplePosition(from, out var a, 4f, NavMesh.AllAreas) &&
-                NavMesh.SamplePosition(to, out var b, 4f, NavMesh.AllAreas) &&
-                NavMesh.CalculatePath(a.position, b.position, NavMesh.AllAreas, navPath) &&
+            if (FloorPoint(from, out var a) && FloorPoint(to, out var b) &&
+                NavMesh.CalculatePath(a, b, NavMesh.AllAreas, navPath) &&
                 navPath.status != NavMeshPathStatus.PathInvalid && navPath.corners.Length >= 2)
             {
                 corners.AddRange(navPath.corners);
                 // Letzter Punkt genau aufs Ziel (Extraction-/Cart-Mitte liegt evtl. neben dem NavMesh)
                 corners.Add(to);
-                Dbg($"Weg: {corners.Count} Punkte, Status {navPath.status}");
+                PathInfo = $"Weg: {(navPath.status == NavMeshPathStatus.PathComplete ? "komplett" : "nur teilweise!")}, {corners.Count} Punkte";
+                Dbg($"{PathInfo}  Start {a} (Kopf {from})  Ende {b}");
                 return;
             }
             // Kein Weg gefunden -> gerade Linie (klappt nur ohne Wand dazwischen)
             corners.Add(from);
             corners.Add(to);
-            Dbg("Kein NavMesh-Weg, gerade Linie");
+            PathInfo = "Weg: KEINER gefunden – gerade Linie";
+            Dbg($"{PathInfo}  Kopf {from}  Ziel {to}");
         }
 
         // Restweg ab dem Punkt auf dem Weg, der dem Kopf am nächsten ist (nur horizontal gemessen)
@@ -352,8 +430,9 @@ namespace KopfZieher
             float best = float.MaxValue;
             for (int i = 0; i < c.Count - 1; i++)
             {
-                var q = ClosestOnSegment(Flat(c[i]), Flat(c[i + 1]), Flat(p), out float t);
-                float d = (q - Flat(p)).sqrMagnitude;
+                // 3D, Höhe halb gewichtet: Kopf schwebt über dem Boden, aber andere Stockwerke sollen nicht passen
+                var q = ClosestOnSegment(Squash(c[i]), Squash(c[i + 1]), Squash(p), out float t);
+                float d = (q - Squash(p)).sqrMagnitude;
                 if (d < best) { best = d; seg = i; onPath = Vector3.Lerp(c[i], c[i + 1], t); }
             }
             float rest = Vector3.Distance(onPath, c[seg + 1]);
@@ -376,6 +455,7 @@ namespace KopfZieher
         }
 
         static Vector3 Flat(Vector3 v) => new Vector3(v.x, 0f, v.z);
+        static Vector3 Squash(Vector3 v) => new Vector3(v.x, v.y * 0.5f, v.z);
 
         static Vector3 ClosestOnSegment(Vector3 a, Vector3 b, Vector3 p, out float t)
         {

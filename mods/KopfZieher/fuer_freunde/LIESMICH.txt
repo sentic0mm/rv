@@ -1,4 +1,4 @@
-KopfZieher 0.3 fuer R.E.P.O.  (EXPERIMENTELL)
+KopfZieher 0.4 fuer R.E.P.O.  (EXPERIMENTELL)
 =============================================
 
 Bist du tot, zieht F9 deinen eigenen Kopf durch die Gaenge:

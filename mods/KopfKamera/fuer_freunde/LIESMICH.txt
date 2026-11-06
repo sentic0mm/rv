@@ -1,4 +1,4 @@
-KopfKamera 0.4 fuer R.E.P.O.  (DEBUG)
+KopfKamera 0.5 fuer R.E.P.O.  (DEBUG)
 =====================================
 
 Wenn du tot bist: 3rd-Person-Kamera hinter deinem eigenen Kopf.

@@ -22,7 +22,7 @@ namespace KopfKamera
     public class Plugin : BaseUnityPlugin
     {
         public const string Guid = "strehl.kopfkamera";
-        public const string Version = "0.4.0";
+        public const string Version = "0.5.0";
 
         internal static ConfigEntry<Key> ToggleKey;
         internal static ConfigEntry<bool> AutoWithPuller;
@@ -75,7 +75,7 @@ namespace KopfKamera
         static readonly AccessTools.FieldRef<SpectateCamera, Camera> MainCam = AccessTools.FieldRefAccess<SpectateCamera, Camera>("MainCamera");
 
         // KopfZieher ist optional: nur per Reflection angefasst
-        static PropertyInfo pullingProp, targetProp;
+        static PropertyInfo pullingProp, targetProp, pathInfoProp;
         static bool pullerLooked;
 
         bool? manual;          // null = automatisch, sonst von Hand per F10 erzwungen
@@ -100,6 +100,7 @@ namespace KopfKamera
             if (t == null) { Plugin.Log.LogInfo("KopfZieher nicht gefunden – nur Handbetrieb (F10)."); return; }
             pullingProp = t.GetProperty("Pulling", BindingFlags.Public | BindingFlags.Static);
             targetProp = t.GetProperty("PullTarget", BindingFlags.Public | BindingFlags.Static);
+            pathInfoProp = t.GetProperty("PathInfo", BindingFlags.Public | BindingFlags.Static);
             Plugin.Log.LogInfo("KopfZieher gefunden – Kamera geht beim Ziehen automatisch an.");
         }
 
@@ -153,7 +154,7 @@ namespace KopfKamera
                 lastHeadPos = p;
                 status = $"KopfKamera {(active ? "AN" : "aus")} ({(manual.HasValue ? "Hand" : "auto")})\n" +
                          $"Kopf: {p.x:F1} {p.y:F1} {p.z:F1}   Tempo: {headSpeed:F1} m/s\n" +
-                         (pulling ? $"KopfZieher: zieht   Ziel noch {Vector3.Distance(p, target):F1} m" : "KopfZieher: wartet");
+                         (pulling ? $"KopfZieher: zieht   Ziel noch {Vector3.Distance(p, target):F1} m   {pathInfoProp?.GetValue(null)}" : "KopfZieher: wartet");
             }
             else status = "";
 
